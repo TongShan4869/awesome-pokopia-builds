@@ -11,6 +11,7 @@
     "ingest": "tsx scripts/ingest.ts",
     "import-screenshot": "tsx scripts/import-screenshot.ts",
     "export-build": "tsx scripts/export-build.ts",
+    "sync:item-catalog": "tsx scripts/sync-item-catalog.ts",
     "check": "astro check"
   },
   "dependencies": {

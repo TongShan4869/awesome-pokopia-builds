@@ -880,7 +880,7 @@ p {
 
 .tag-ribbon span,
 .chip-row span,
-.item-panel li {
+.legacy-item-list li {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.68);
@@ -1030,12 +1030,59 @@ p {
 }
 
 .item-panel ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
   margin: 0 0 1rem;
   padding: 0;
   list-style: none;
+}
+
+.inferred-item-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+.inferred-item-card {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 0.7rem;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.68);
+  padding: 0.62rem;
+}
+
+.inferred-item-card img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.inferred-item-card a,
+.inferred-item-card span {
+  display: block;
+  color: var(--ink);
+  font-weight: 900;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.inferred-item-card small {
+  display: block;
+  margin-top: 0.18rem;
+  color: var(--mint-dark);
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.inferred-item-card p {
+  margin: 0.28rem 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.35;
 }
 
 @media (max-width: 860px) {

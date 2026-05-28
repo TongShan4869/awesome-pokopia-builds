@@ -136,13 +136,23 @@ if (!existsSync(firstFramePath)) {
     "\nManual fallback: add a screenshot to this path, then rerun export after review.";
 }
 
-const itemDb = await readJson<Array<{ name: string; aliases?: string[] }>>(
-  path.join(process.cwd(), "data", "items.json"),
-).catch(() => []);
+type ItemVocabularyEntry = { name: string; aliases?: string[]; searchTerms?: string[] };
+type ItemCatalog = { items?: ItemVocabularyEntry[] };
+
+const itemDb = await readJson<ItemCatalog | ItemVocabularyEntry[]>(
+  path.join(process.cwd(), "data", "pokopia-item-catalog.json"),
+)
+  .then((database) => {
+    if (Array.isArray(database)) return database;
+    return database.items ?? [];
+  })
+  .catch(() => readJson<ItemVocabularyEntry[]>(path.join(process.cwd(), "data", "items.json")).catch(() => []));
 const haystack = `${pageTitle}\n${visibleText}`.toLowerCase();
 const inferredItems: ItemGuess[] = itemDb
   .filter((item) =>
-    [item.name, ...(item.aliases ?? [])].some((name) => haystack.includes(name.toLowerCase())),
+    [item.name, ...(item.aliases ?? []), ...(item.searchTerms ?? [])].some((name) =>
+      haystack.includes(name.toLowerCase()),
+    ),
   )
   .map((item) => ({
     name: item.name,
@@ -154,7 +164,7 @@ const inferredItems: ItemGuess[] = itemDb
 const itemsExcerpt = JSON.stringify(itemDb.slice(0, 40), null, 2);
 const aiReviewPrompt = `Review the captured frames in curation/${slug}/frames for a Pokemon Pokopia build.
 
-Use data/items.json as the item vocabulary. Suggest likely items, tags, and a short public summary.
+Use data/pokopia-item-catalog.json as the item vocabulary when present, falling back to data/items.json. Suggest likely exact item names, tags, and a short public summary.
 Keep confidence and rejected guesses in this private curation JSON only. Do not publish confidence scores to the website.
 Pick selectedFrame only after visually confirming it shows the complete build, not the intro, creator face, UI chrome, or a transition.
 

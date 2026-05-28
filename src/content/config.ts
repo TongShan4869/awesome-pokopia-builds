@@ -10,6 +10,16 @@ const builds = defineCollection({
     heroImage: z.string(),
     tags: z.array(z.string()).default([]),
     items: z.array(z.string()).default([]),
+    inferredItems: z
+      .array(
+        z.object({
+          name: z.string(),
+          image: z.string(),
+          confidence: z.number().min(0).max(1).optional(),
+          evidence: z.string().optional(),
+        }),
+      )
+      .default([]),
     summary: z.string(),
     capturedAt: z.string().optional(),
   }),

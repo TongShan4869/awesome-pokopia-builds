@@ -12,6 +12,10 @@ if (!slug) {
 const root = process.cwd();
 const draftPath = path.join(root, "curation", `${slug}.json`);
 const draft = await readJson<CurationDraft>(draftPath);
+const itemDatabase = await readJson<{
+  items?: Array<{ name: string; image?: string; description?: string }>;
+}>(path.join(root, "data", "pokopia-item-catalog.json")).catch(() => ({ items: [] }));
+const itemLookup = new Map((itemDatabase.items ?? []).map((item) => [item.name.toLowerCase(), item]));
 
 if (draft.reviewState !== "reviewed") {
   console.error(`Refusing to export ${slug}: curation reviewState is "${draft.reviewState}".`);
@@ -25,6 +29,12 @@ await ensureDir(heroDir);
 await copyFile(path.join(root, draft.selectedFrame), heroPath);
 
 const publicItems = draft.inferredItems.map((item) => item.name);
+const publicInferredItems = draft.inferredItems.map((item) => ({
+  name: item.name,
+  image: item.image ?? itemLookup.get(item.name.toLowerCase())?.image ?? "",
+  confidence: item.confidence,
+  evidence: item.evidence ?? item.note ?? itemLookup.get(item.name.toLowerCase())?.description,
+}));
 const mdx = `---
 title: ${JSON.stringify(draft.title)}
 sourceUrl: ${JSON.stringify(draft.sourceUrl)}
@@ -33,6 +43,7 @@ creator: ${JSON.stringify(draft.creator)}
 heroImage: ${JSON.stringify(`/images/builds/${draft.slug}/hero.png`)}
 tags: ${JSON.stringify(draft.tags)}
 items: ${JSON.stringify(publicItems)}
+inferredItems: ${JSON.stringify(publicInferredItems)}
 summary: ${JSON.stringify(draft.summary)}
 capturedAt: ${JSON.stringify(draft.capturedAt)}
 ---

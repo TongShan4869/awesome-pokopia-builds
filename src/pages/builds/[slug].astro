@@ -12,6 +12,15 @@ export async function getStaticPaths() {
 
 const { build } = Astro.props;
 const { Content } = await render(build);
+const displayedItems =
+  build.data.inferredItems.length > 0
+    ? build.data.inferredItems
+    : build.data.items.map((item) => ({
+        name: item,
+        image: "",
+        confidence: undefined,
+        evidence: undefined,
+      }));
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
@@ -38,10 +47,23 @@ const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
           <Content />
         </div>
         <aside class="item-panel">
-          <h2>Noted items</h2>
-          {build.data.items.length > 0 ? (
-            <ul>
-              {build.data.items.map((item) => <li>{item}</li>)}
+          <h2>Inferred Pokopia items</h2>
+          {displayedItems.length > 0 ? (
+            <ul class="inferred-item-grid">
+              {displayedItems.map((item) => (
+                <li class="inferred-item-card">
+                  {item.image && (
+                    <img src={assetPath(item.image)} alt={`${item.name} item figure`} loading="lazy" />
+                  )}
+                  <div>
+                    <span>{item.name}</span>
+                    {typeof item.confidence === "number" && (
+                      <small>{Math.round(item.confidence * 100)}% visual match</small>
+                    )}
+                    {item.evidence && <p>{item.evidence}</p>}
+                  </div>
+                </li>
+              ))}
             </ul>
           ) : (
             <p>No public item notes yet.</p>

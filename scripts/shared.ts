@@ -6,6 +6,8 @@ export type Platform = "youtube" | "tiktok" | "instagram" | "other";
 export interface ItemGuess {
   name: string;
   confidence: number;
+  image?: string;
+  evidence?: string;
   evidenceFrame?: string;
   note?: string;
 }
