@@ -8,9 +8,12 @@ This repo stores source links, screenshots, public summaries, and curated item n
 
 - `src/content/builds/*.mdx` - public build summaries shown on the website
 - `public/images/builds/*/hero.png` - curated full-build screenshots
-- `data/items.json` - the item database maintained by the curator
+- `data/pokopia-item-catalog.json` - local item catalog for exact item-name inference
+- `data/items.json` - small fallback item database maintained by the curator
+- `public/images/items/*.png` - local item figure copies used by build pages
 - `scripts/ingest.ts` - local-only browser capture workflow for social links
 - `scripts/export-build.ts` - converts reviewed curation data into public MDX
+- `scripts/sync-item-catalog.ts` - refreshes the local item catalog and item figures
 
 ## Local workflow
 
@@ -19,6 +22,12 @@ Install dependencies:
 ```bash
 corepack pnpm install
 corepack pnpm exec playwright install chromium
+```
+
+Refresh the local item catalog:
+
+```bash
+POKOPIA_ITEM_CATALOG_URL="<catalog-url>" corepack pnpm sync:item-catalog
 ```
 
 Capture frames from a source link:

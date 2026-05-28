@@ -2,43 +2,73 @@
   {
     "name": "Wood",
     "category": "Material",
-    "tags": ["crafting", "natural"],
-    "sourceUrl": "https://www.serebii.net/pokemonpokopia/items.shtml",
-    "aliases": ["Lumber", "Timber"]
+    "tags": [
+      "crafting",
+      "natural"
+    ],
+    "aliases": [
+      "Lumber",
+      "Timber"
+    ]
   },
   {
     "name": "Stone",
     "category": "Material",
-    "tags": ["crafting", "path", "garden"],
-    "sourceUrl": "https://www.serebii.net/pokemonpokopia/items.shtml",
-    "aliases": ["Rock"]
+    "tags": [
+      "crafting",
+      "path",
+      "garden"
+    ],
+    "aliases": [
+      "Rock"
+    ]
   },
   {
     "name": "Berry",
     "category": "Plant",
-    "tags": ["garden", "decor"],
-    "sourceUrl": "https://www.serebii.net/pokemonpokopia/items.shtml",
-    "aliases": ["Berries"]
+    "tags": [
+      "garden",
+      "decor"
+    ],
+    "aliases": [
+      "Berries"
+    ]
   },
   {
     "name": "Flower",
     "category": "Plant",
-    "tags": ["garden", "color", "decor"],
-    "sourceUrl": "https://www.serebii.net/pokemonpokopia/items.shtml",
-    "aliases": ["Flowers"]
+    "tags": [
+      "garden",
+      "color",
+      "decor"
+    ],
+    "aliases": [
+      "Flowers"
+    ]
   },
   {
     "name": "Fence",
     "category": "Outdoor",
-    "tags": ["boundary", "farm", "garden"],
-    "sourceUrl": "https://www.serebii.net/pokemonpokopia/items.shtml",
-    "aliases": ["Fencing"]
+    "tags": [
+      "boundary",
+      "farm",
+      "garden"
+    ],
+    "aliases": [
+      "Fencing"
+    ]
   },
   {
     "name": "Lantern",
     "category": "Lighting",
-    "tags": ["night", "decor", "cozy"],
-    "sourceUrl": "https://www.serebii.net/pokemonpokopia/items.shtml",
-    "aliases": ["Lamp", "Light"]
+    "tags": [
+      "night",
+      "decor",
+      "cozy"
+    ],
+    "aliases": [
+      "Lamp",
+      "Light"
+    ]
   }
 ]

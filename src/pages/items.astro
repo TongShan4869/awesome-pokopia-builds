@@ -1,0 +1,133 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import catalog from "../../data/pokopia-item-catalog.json";
+
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
+const items = catalog.items
+  .filter((item) => item.imageAvailable && item.image)
+  .sort((a, b) => a.name.localeCompare(b.name));
+const allSections = [...new Set(items.map((item) => item.section))].sort();
+const featuredSections = allSections.slice(0, 7);
+---
+
+<BaseLayout
+  title="Pokopia Item Catalog · awesome-pokopia-builds"
+  description="A visual local catalog of Pokopia item figures used for build inventory notes."
+>
+  <main class="detail-shell catalog-shell">
+    <a class="back-link" href={basePath} aria-label="Back to gallery">
+      <span aria-hidden="true">←</span>
+      Back to gallery
+    </a>
+
+    <header class="catalog-header">
+      <div>
+        <p class="eyebrow">Visual item catalog</p>
+        <h1>Pokopia Items</h1>
+        <p>
+          A local reference for matching build screenshots to exact item names, figures, and
+          item families.
+        </p>
+      </div>
+      <div class="catalog-count">
+        <span>{items.length}</span>
+        <small>figures</small>
+      </div>
+    </header>
+
+    <section class="catalog-controls" aria-label="Catalog filters">
+      <label>
+        <span>Search items</span>
+        <input type="search" id="item-search" placeholder="Stone steps, window, roof..." />
+      </label>
+      <label>
+        <span>Section</span>
+        <select id="section-filter">
+          <option value="">All sections</option>
+          {allSections.map((section) => <option value={section}>{section}</option>)}
+        </select>
+      </label>
+    </section>
+
+    <section class="catalog-section-ribbon" aria-label="Common item sections">
+      {featuredSections.map((section) => <button type="button" data-section-chip={section}>{section}</button>)}
+    </section>
+
+    <p class="catalog-result-count" id="catalog-result-count">{items.length} visible items</p>
+
+    <section class="catalog-grid" aria-label="Pokopia item catalog">
+      {items.map((item) => (
+        <article
+          class="catalog-item-card"
+          data-item-card
+          data-name={item.name.toLowerCase()}
+          data-section={item.section}
+          data-tags={item.tags.join(" ").toLowerCase()}
+          data-description={item.description.toLowerCase()}
+        >
+          <img src={assetPath(item.image)} alt={`${item.name} figure`} loading="lazy" />
+          <div>
+            <h2>{item.name}</h2>
+            <p>{item.section}</p>
+            {item.tags.length > 0 && (
+              <div class="catalog-mini-tags">
+                {item.tags.slice(0, 2).map((tag) => <span>{tag}</span>)}
+              </div>
+            )}
+          </div>
+        </article>
+      ))}
+    </section>
+  </main>
+
+  <script>
+    const searchInput = document.querySelector<HTMLInputElement>("#item-search");
+    const sectionFilter = document.querySelector<HTMLSelectElement>("#section-filter");
+    const resultCount = document.querySelector<HTMLElement>("#catalog-result-count");
+    const cards = [...document.querySelectorAll<HTMLElement>("[data-item-card]")];
+    const sectionChips = [...document.querySelectorAll<HTMLButtonElement>("[data-section-chip]")];
+
+    function updateCatalog() {
+      const query = searchInput?.value.trim().toLowerCase() ?? "";
+      const section = sectionFilter?.value ?? "";
+      let visibleCount = 0;
+
+      for (const card of cards) {
+        const haystack = [
+          card.dataset.name,
+          card.dataset.section,
+          card.dataset.tags,
+          card.dataset.description,
+        ].join(" ");
+        const matchesQuery = query === "" || haystack.includes(query);
+        const matchesSection = section === "" || card.dataset.section === section;
+        const visible = matchesQuery && matchesSection;
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      }
+
+      if (resultCount) {
+        resultCount.textContent = `${visibleCount} visible ${visibleCount === 1 ? "item" : "items"}`;
+      }
+    }
+
+    const initialQuery = new URLSearchParams(window.location.search).get("q");
+    if (initialQuery && searchInput) {
+      searchInput.value = initialQuery;
+    }
+
+    searchInput?.addEventListener("input", updateCatalog);
+    sectionFilter?.addEventListener("change", updateCatalog);
+    for (const chip of sectionChips) {
+      chip.addEventListener("click", () => {
+        if (sectionFilter) sectionFilter.value = chip.dataset.sectionChip ?? "";
+        updateCatalog();
+      });
+    }
+
+    updateCatalog();
+  </script>
+</BaseLayout>

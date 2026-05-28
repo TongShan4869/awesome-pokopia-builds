@@ -1,6 +1,8 @@
 ---
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import catalog from "../../../data/pokopia-item-catalog.json";
+import { tagSlug } from "../../utils/tags";
 
 export async function getStaticPaths() {
   const builds = await getCollection("builds");
@@ -12,15 +14,49 @@ export async function getStaticPaths() {
 
 const { build } = Astro.props;
 const { Content } = await render(build);
+const displayedItems =
+  build.data.inferredItems.length > 0
+    ? build.data.inferredItems
+    : build.data.items.map((item) => ({
+        name: item,
+        image: "",
+        confidence: undefined,
+        evidence: undefined,
+      }));
+const catalogByName = new Map(catalog.items.map((item) => [item.name, item]));
+const buildCatalogItems = build.data.items
+  .map((item) => catalogByName.get(item))
+  .filter((item) => item !== undefined);
+const itemSections = [...new Set(buildCatalogItems.map((item) => item.section))].sort();
+const itemTags = [...new Set(buildCatalogItems.flatMap((item) => item.tags))].sort();
+const sourcePublishedDate = build.data.sourcePublishedAt
+  ? new Intl.DateTimeFormat("en", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(build.data.sourcePublishedAt))
+  : null;
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
+const galleryImages =
+  build.data.galleryImages.length > 0
+    ? build.data.galleryImages
+    : [
+        {
+          src: build.data.heroImage,
+          alt: `${build.data.title} full build screenshot`,
+        },
+      ];
+const firstGalleryImage = galleryImages[0];
 ---
 
 <BaseLayout title={`${build.data.title} · awesome-pokopia-builds`} description={build.data.summary}>
   <main class="detail-shell">
-    <a class="back-link" href={basePath}>Back to gallery</a>
+    <a class="back-link" href={basePath} aria-label="Back to gallery">
+      <span aria-hidden="true">←</span>
+      Back to gallery
+    </a>
     <article class="build-detail">
       <header class="detail-header">
         <div>
@@ -31,27 +67,153 @@ const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
         <a class="button primary" href={build.data.sourceUrl} target="_blank" rel="noreferrer">Open source</a>
       </header>
 
-      <img class="detail-image" src={assetPath(build.data.heroImage)} alt={`${build.data.title} full build screenshot`} />
+      <section class="build-gallery" data-build-gallery>
+        <img
+          class="detail-image"
+          src={assetPath(firstGalleryImage.src)}
+          alt={firstGalleryImage.alt ?? `${build.data.title} build screenshot`}
+          data-gallery-main
+        />
+        {galleryImages.length > 1 && (
+          <div class="gallery-strip" aria-label="Build screenshots">
+            {galleryImages.map((image, index) => (
+              <button
+                class:list={["gallery-thumb", { "is-active": index === 0 }]}
+                type="button"
+                aria-label={`Show screenshot ${index + 1}`}
+                aria-pressed={index === 0 ? "true" : "false"}
+                data-gallery-src={assetPath(image.src)}
+                data-gallery-alt={image.alt ?? `${build.data.title} build screenshot ${index + 1}`}
+              >
+                <img src={assetPath(image.src)} alt="" loading={index === 0 ? "eager" : "lazy"} />
+                {image.caption && <span>{image.caption}</span>}
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section class="detail-grid">
         <div class="notes prose">
           <Content />
+          <section class="source-card">
+            <h2>Source</h2>
+            <dl>
+              <div>
+                <dt>Post title</dt>
+                <dd>{build.data.sourceTitle ?? build.data.title}</dd>
+              </div>
+              <div>
+                <dt>Video posted by</dt>
+                <dd>
+                  {build.data.sourceAuthorUrl ? (
+                    <a href={build.data.sourceAuthorUrl} target="_blank" rel="noreferrer">
+                      {build.data.sourceAuthor ?? build.data.creator}
+                    </a>
+                  ) : (
+                    build.data.sourceAuthor ?? build.data.creator
+                  )}
+                </dd>
+              </div>
+              {sourcePublishedDate && (
+                <div>
+                  <dt>Published</dt>
+                  <dd>{sourcePublishedDate}</dd>
+                </div>
+              )}
+              <div>
+                <dt>Original link</dt>
+                <dd>
+                  <a href={build.data.sourceUrl} target="_blank" rel="noreferrer">
+                    {build.data.sourceUrl}
+                  </a>
+                </dd>
+              </div>
+            </dl>
+          </section>
+          <section class="item-panel build-item-section">
+            <h2>Items may used in this build</h2>
+            {displayedItems.length > 0 ? (
+              <ul class="inferred-item-grid">
+                {displayedItems.map((item) => (
+                  <li>
+                    <a class="inferred-item-card" href={`${basePath}items/?q=${encodeURIComponent(item.name)}`}>
+                    {item.image && (
+                      <img src={assetPath(item.image)} alt={`${item.name} item figure`} loading="lazy" />
+                    )}
+                    <div>
+                      <span>{item.name}</span>
+                      {item.evidence && <p>{item.evidence}</p>}
+                    </div>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No public item notes yet.</p>
+            )}
+          </section>
         </div>
-        <aside class="item-panel">
-          <h2>Noted items</h2>
-          {build.data.items.length > 0 ? (
-            <ul>
-              {build.data.items.map((item) => <li>{item}</li>)}
-            </ul>
-          ) : (
-            <p>No public item notes yet.</p>
-          )}
+        <aside class="item-panel meta-panel">
+          <h2>Build details</h2>
+          <dl class="meta-list">
+            <div>
+              <dt>Build creator</dt>
+              <dd>{build.data.creator}</dd>
+            </div>
+            <div>
+              <dt>Platform</dt>
+              <dd>{build.data.platform}</dd>
+            </div>
+          </dl>
+
           <h2>Themes</h2>
           <div class="chip-row">
-            {build.data.tags.map((tag) => <span>{tag}</span>)}
+            {build.data.tags.map((tag) => (
+              <a href={`${basePath}tags/${tagSlug(tag)}/`}>{tag}</a>
+            ))}
           </div>
+
+          {itemSections.length > 0 && (
+            <>
+              <h2>Item sections</h2>
+              <div class="chip-row">
+                {itemSections.map((section) => <span>{section}</span>)}
+              </div>
+            </>
+          )}
+
+          {itemTags.length > 0 && (
+            <>
+              <h2>Item tags</h2>
+              <div class="chip-row">
+                {itemTags.map((tag) => <span>{tag}</span>)}
+              </div>
+            </>
+          )}
         </aside>
       </section>
     </article>
   </main>
 </BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-build-gallery]").forEach((gallery) => {
+    const mainImage = gallery.querySelector<HTMLImageElement>("[data-gallery-main]");
+    const buttons = [...gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-src]")];
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!mainImage) return;
+
+        mainImage.src = button.dataset.gallerySrc ?? mainImage.src;
+        mainImage.alt = button.dataset.galleryAlt ?? mainImage.alt;
+        buttons.forEach((item) => {
+          const isActive = item === button;
+          item.classList.toggle("is-active", isActive);
+          item.setAttribute("aria-pressed", String(isActive));
+        });
+      });
+    });
+  });
+</script>
