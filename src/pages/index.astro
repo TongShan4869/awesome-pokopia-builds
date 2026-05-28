@@ -1,12 +1,14 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import catalog from "../../data/pokopia-item-catalog.json";
+import { tagSlug } from "../utils/tags";
 
 const builds = (await getCollection("builds")).sort((a, b) =>
   a.data.title.localeCompare(b.data.title),
 );
 const allTags = [...new Set(builds.flatMap((build) => build.data.tags))].sort();
-const featuredItems = [...new Set(builds.flatMap((build) => build.data.items))].slice(0, 10);
+const itemCatalogCount = catalog.items.filter((item) => item.imageAvailable && item.image).length;
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
@@ -27,6 +29,7 @@ const repoUrl =
         </p>
         <div class="hero-actions">
           <a class="button primary" href="#gallery">Browse builds</a>
+          <a class="button secondary" href={`${basePath}items/`}>Item catalog</a>
           <a class="button secondary" href={repoUrl} rel="noreferrer">View repo</a>
         </div>
       </div>
@@ -82,14 +85,26 @@ const repoUrl =
         <span class="label">themes</span>
       </div>
       <div>
-        <span class="metric">{featuredItems.length}</span>
-        <span class="label">noted items</span>
+        <span class="metric">{itemCatalogCount}</span>
+        <span class="label">catalog figures</span>
       </div>
+    </section>
+
+    <section class="catalog-preview" aria-label="Item catalog preview">
+      <div>
+        <p class="eyebrow">Item reference</p>
+        <h2>Exact item figures for visual inventory notes.</h2>
+        <p>
+          The gallery can pair builds with precise item names and figures, so screenshot notes
+          become useful reference material instead of loose material guesses.
+        </p>
+      </div>
+      <a class="button primary" href={`${basePath}items/`}>Open catalog</a>
     </section>
 
     {allTags.length > 0 && (
       <section class="tag-ribbon" aria-label="Build themes">
-        {allTags.map((tag) => <span>{tag}</span>)}
+        {allTags.map((tag) => <a href={`${basePath}tags/${tagSlug(tag)}/`}>{tag}</a>)}
       </section>
     )}
 

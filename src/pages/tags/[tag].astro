@@ -1,0 +1,62 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { tagSlug } from "../../utils/tags";
+
+export async function getStaticPaths() {
+  const builds = await getCollection("builds");
+  const tags = [...new Set(builds.flatMap((build) => build.data.tags))].sort();
+
+  return tags.map((tag) => ({
+    params: { tag: tagSlug(tag) },
+    props: {
+      tag,
+      builds: builds
+        .filter((build) => build.data.tags.includes(tag))
+        .sort((a, b) => a.data.title.localeCompare(b.data.title)),
+    },
+  }));
+}
+
+const { tag, builds } = Astro.props;
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
+---
+
+<BaseLayout
+  title={`${tag} builds · awesome-pokopia-builds`}
+  description={`Pokopia builds tagged ${tag}.`}
+>
+  <main class="site-shell tag-index-shell">
+    <a class="back-link" href={basePath} aria-label="Back to gallery">
+      <span aria-hidden="true">←</span>
+      Back to gallery
+    </a>
+
+    <header class="tag-index-header">
+      <p class="eyebrow">Build tag</p>
+      <h1>{tag}</h1>
+      <p>{builds.length} {builds.length === 1 ? "build" : "builds"} in this collection</p>
+    </header>
+
+    <section class="gallery tag-gallery" aria-label={`${tag} Pokopia builds`}>
+      {builds.map((build) => (
+        <a class="build-card" href={`${basePath}builds/${build.slug}/`}>
+          <img src={assetPath(build.data.heroImage)} alt={`${build.data.title} full build screenshot`} loading="lazy" />
+          <div class="build-card-copy">
+            <p>{build.data.platform} · {build.data.creator}</p>
+            <h2>{build.data.title}</h2>
+            <span>{build.data.summary}</span>
+          </div>
+          <div class="chip-row">
+            {build.data.tags.slice(0, 3).map((tagName) => (
+              <span>{tagName}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </section>
+  </main>
+</BaseLayout>
