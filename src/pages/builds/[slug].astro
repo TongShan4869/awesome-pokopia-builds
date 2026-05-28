@@ -1,0 +1,57 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const builds = await getCollection("builds");
+  return builds.map((build) => ({
+    params: { slug: build.slug },
+    props: { build },
+  }));
+}
+
+const { build } = Astro.props;
+const { Content } = await render(build);
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
+---
+
+<BaseLayout title={`${build.data.title} · awesome-pokopia-builds`} description={build.data.summary}>
+  <main class="detail-shell">
+    <a class="back-link" href={basePath}>Back to gallery</a>
+    <article class="build-detail">
+      <header class="detail-header">
+        <div>
+          <p class="eyebrow">{build.data.platform} · {build.data.creator}</p>
+          <h1>{build.data.title}</h1>
+          <p>{build.data.summary}</p>
+        </div>
+        <a class="button primary" href={build.data.sourceUrl} target="_blank" rel="noreferrer">Open source</a>
+      </header>
+
+      <img class="detail-image" src={assetPath(build.data.heroImage)} alt={`${build.data.title} full build screenshot`} />
+
+      <section class="detail-grid">
+        <div class="notes prose">
+          <Content />
+        </div>
+        <aside class="item-panel">
+          <h2>Noted items</h2>
+          {build.data.items.length > 0 ? (
+            <ul>
+              {build.data.items.map((item) => <li>{item}</li>)}
+            </ul>
+          ) : (
+            <p>No public item notes yet.</p>
+          )}
+          <h2>Themes</h2>
+          <div class="chip-row">
+            {build.data.tags.map((tag) => <span>{tag}</span>)}
+          </div>
+        </aside>
+      </section>
+    </article>
+  </main>
+</BaseLayout>

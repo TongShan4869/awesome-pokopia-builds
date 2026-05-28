@@ -1,0 +1,27 @@
+{
+  "name": "awesome-pokopia-builds",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "ingest": "tsx scripts/ingest.ts",
+    "export-build": "tsx scripts/export-build.ts",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/mdx": "^4.3.1",
+    "astro": "^5.9.3",
+    "playwright": "^1.52.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "zod": "^3.25.32"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1"
+  }
+}

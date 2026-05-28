@@ -1,0 +1,98 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const builds = (await getCollection("builds")).sort((a, b) =>
+  a.data.title.localeCompare(b.data.title),
+);
+const allTags = [...new Set(builds.flatMap((build) => build.data.tags))].sort();
+const featuredItems = [...new Set(builds.flatMap((build) => build.data.items))].slice(0, 10);
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
+const repoUrl =
+  import.meta.env.PUBLIC_REPO_URL || "https://github.com/TongShan4869/awesome-pokopia-builds";
+---
+
+<BaseLayout>
+  <main class="site-shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Pokopia build scrapbook</p>
+        <h1>Soft little worlds, saved before they scroll away.</h1>
+        <p class="hero-text">
+          A curated gallery of Pokopia builds discovered in social videos, with screenshots,
+          creator credit, and clean item notes for later remixing.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#gallery">Browse builds</a>
+          <a class="button secondary" href={repoUrl} rel="noreferrer">View repo</a>
+        </div>
+      </div>
+      <div class="hero-specimen" aria-label="Decorative Pokopia gallery preview">
+        <div class="specimen-frame">
+          <div class="sky"></div>
+          <div class="hill hill-one"></div>
+          <div class="hill hill-two"></div>
+          <div class="pond"></div>
+          <div class="house">
+            <span></span>
+          </div>
+          <div class="path"></div>
+          <div class="sparkle s1"></div>
+          <div class="sparkle s2"></div>
+          <div class="sparkle s3"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="Gallery summary">
+      <div>
+        <span class="metric">{builds.length}</span>
+        <span class="label">curated builds</span>
+      </div>
+      <div>
+        <span class="metric">{allTags.length}</span>
+        <span class="label">themes</span>
+      </div>
+      <div>
+        <span class="metric">{featuredItems.length}</span>
+        <span class="label">noted items</span>
+      </div>
+    </section>
+
+    {allTags.length > 0 && (
+      <section class="tag-ribbon" aria-label="Build themes">
+        {allTags.map((tag) => <span>{tag}</span>)}
+      </section>
+    )}
+
+    <section id="gallery" class="gallery" aria-label="Pokopia build gallery">
+      {builds.length === 0 ? (
+        <div class="empty-state">
+          <p class="eyebrow">No builds exported yet</p>
+          <h2>Drop in your first social link locally.</h2>
+          <p>
+            Run <code>corepack pnpm ingest "&lt;url&gt;"</code>, review the private curation
+            draft, then export a public build page when the screenshot and notes feel right.
+          </p>
+        </div>
+      ) : (
+        builds.map((build) => (
+          <a class="build-card" href={`${basePath}builds/${build.slug}/`}>
+            <img src={assetPath(build.data.heroImage)} alt={`${build.data.title} full build screenshot`} loading="lazy" />
+            <div class="build-card-copy">
+              <p>{build.data.platform} · {build.data.creator}</p>
+              <h2>{build.data.title}</h2>
+              <span>{build.data.summary}</span>
+            </div>
+            <div class="chip-row">
+              {build.data.tags.slice(0, 3).map((tag) => <span>{tag}</span>)}
+            </div>
+          </a>
+        ))
+      )}
+    </section>
+  </main>
+</BaseLayout>
