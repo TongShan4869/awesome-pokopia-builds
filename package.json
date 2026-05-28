@@ -9,6 +9,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "ingest": "tsx scripts/ingest.ts",
+    "import-screenshot": "tsx scripts/import-screenshot.ts",
     "export-build": "tsx scripts/export-build.ts",
     "check": "astro check"
   },

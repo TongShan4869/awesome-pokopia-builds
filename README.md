@@ -36,6 +36,12 @@ The screenshot check is manual and strict:
 - Edit inferred items and public notes.
 - Set `reviewState` to `"reviewed"` only after that visual check.
 
+If you already have the right screenshot, import it directly:
+
+```bash
+corepack pnpm import-screenshot "{slug}" "/absolute/path/to/screenshot.png"
+```
+
 Then export:
 
 ```bash
