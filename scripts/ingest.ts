@@ -220,9 +220,9 @@ const aiReviewPrompt = `Review the captured frames in curation/${slug}/frames fo
 
 Use data/pokopia-item-catalog.json as the item vocabulary when present, falling back to data/items.json. Suggest likely exact item names, tags, and a short public summary.
 Keep confidence and rejected guesses in this private curation JSON only. Do not publish confidence scores to the website.
-Pick selectedFrame only after visually confirming it shows the complete build, not the intro, creator face, UI chrome, or a transition.
+Pick selectedFrame only after visually confirming it shows the complete finished build, not the creator face, a blank intro card, UI chrome, or an active construction step.
 The script auto-picked selectedFrame from frameAnalyses; treat that as a ranked suggestion, not a final visual review.
-Prefer frames that show a finished whole build, usually showcase or recap moments near the beginning or end of a video.
+Prefer frames that show the full finished build and its surrounding zones, usually showcase/title-card/recap moments near the first few seconds or near the end of a video. A full-build frame with subtitles is better than a clean close-up crop.
 For compilation videos, use sourceTimeSeconds to identify separate builds and pick the strongest full-building frame for each useful entry.
 Also look for explicit item/material list frames such as "recommended items", "materials", or "what I used". Keep those as item-evidence frames even when they are not suitable hero screenshots.
 
@@ -395,10 +395,11 @@ async function getVideoDurationSeconds(page: Page) {
 
 function buildShowcaseSampleTimes(durationSeconds: number) {
   if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
-    return [6, 12, 20, 32, 48, 66, 88, 115, 150, 190, 240, 300];
+    return [2, 4, 6, 8, 12, 16, 20, 32, 48, 66, 88, 115, 150, 190, 240, 300];
   }
 
   const duration = Math.max(12, Math.floor(durationSeconds));
+  const openingShowcaseTimes = [2, 4, 6, 8, 12, 16, 20, 32, 48, 66, 88];
   const proportionalTimes = [
     0.04,
     0.08,
@@ -422,10 +423,14 @@ function buildShowcaseSampleTimes(durationSeconds: number) {
   const endWindow = [endWindowStart, duration - 60, duration - 40, duration - 25, duration - 12];
 
   return Array.from(
-    new Set([...proportionalTimes, ...endWindow].filter((time) => time > 2 && time < duration - 2).map(Math.round)),
+    new Set(
+      [...openingShowcaseTimes, ...proportionalTimes, ...endWindow]
+        .filter((time) => time > 1 && time < duration - 2)
+        .map(Math.round),
+    ),
   )
     .sort((a, b) => a - b)
-    .slice(0, 24);
+    .slice(0, 30);
 }
 
 async function analyzeFrames(
@@ -538,6 +543,13 @@ async function analyzeFrames(
 
     if (sourceTimeSeconds !== undefined && durationSeconds > 0) {
       const progress = sourceTimeSeconds / durationSeconds;
+      if (sourceTimeSeconds <= 20) {
+        score += 0.18;
+        reasons.push("opening full-build showcase zone");
+      } else if (sourceTimeSeconds <= 90) {
+        score += 0.08;
+        reasons.push("early overview/showcase zone");
+      }
       if (progress < 0.15) {
         score += 0.04;
         reasons.push("early-video showcase zone");
