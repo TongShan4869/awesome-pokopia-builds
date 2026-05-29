@@ -39,22 +39,22 @@ corepack pnpm ingest "https://www.youtube.com/watch?v=V2PGF9Rfc8Q"
 
 The ingest command scans the video for likely showcase moments, captures timestamped candidate frames, scores them with local visual heuristics, auto-selects the strongest screenshot candidate, and fills any source metadata it can find. Review the generated file in `curation/{slug}.json` and open the selected image plus any close runners-up in `curation/{slug}/frames/`. These files are tracked so future curation work can see the original candidates and review trail, but they are not part of the rendered Astro site.
 
-If YouTube headless capture returns blank/player-shell frames, use the real Chrome fallback. Open the video in Chrome, seek to a completed-build showcase frame, wait for YouTube controls to fade, then capture the visible player crop:
+If YouTube headless capture returns blank/player-shell frames, capture a specific timestamp through the Playwright/Chrome DevTools fallback:
 
 ```bash
-corepack pnpm capture-chrome-frame "{slug}" --time=0
+corepack pnpm capture-browser-frame "{slug}" --open-source --time=0 --name=opening-showcase.png
 ```
 
-The default crop is tuned for the current Chrome window layout (`15,220,925,405`), which avoids the YouTube header and controls. Override it with `--rect=x,y,width,height` if Chrome is positioned differently. This updates `selectedFrame`, prepends the screenshot to `frames`, and records that the frame came from a curator-selected real-Chrome capture.
+By default this launches an isolated Playwright-controlled browser, mutes the video, seeks to `--time`, hides YouTube controls, and screenshots the player through the browser context. It does not capture your desktop or normal Chrome tabs. If headless YouTube renders a blank shell, add `--headed`; this still uses a dedicated browser context and DevTools screenshot, not macOS screen capture. The command updates `selectedFrame`, prepends the screenshot to `frames`, and records the capture method in `frameAnalyses`.
 
-For faster review, let the helper timestamp-hop in Chrome and capture after a short settle:
+For faster review, timestamp-hop and capture after a short settle:
 
 ```bash
-corepack pnpm capture-chrome-frame "{slug}" --open-source --time=0 --name=chrome-start.png --settle-ms=1400
-corepack pnpm capture-chrome-frame "{slug}" --open-source --time=416 --name=chrome-final-tour.png --settle-ms=1400
+corepack pnpm capture-browser-frame "{slug}" --open-source --time=0 --name=opening-showcase.png --settle-ms=1400
+corepack pnpm capture-browser-frame "{slug}" --open-source --time=416 --name=final-tour.png --settle-ms=1400 --headed
 ```
 
-Use `--toggle-mute` once if the YouTube tab is audible. It sends YouTube's `m` shortcut, so only use it when sound is currently on. The screenshot crop still needs the Chrome window visible; true background capture would need a separate browser/media-stream path.
+`capture-chrome-frame` remains as an alias for older notes. The old visible-screen crop is still available with `--desktop --rect=x,y,width,height`, but prefer the Playwright path unless the browser capture cannot render the video at all.
 
 The screenshot check is manual and strict:
 
