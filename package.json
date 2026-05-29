@@ -9,6 +9,7 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "ingest": "tsx scripts/ingest.ts",
+    "capture-chrome-frame": "tsx scripts/capture-chrome-frame.ts",
     "import-screenshot": "tsx scripts/import-screenshot.ts",
     "export-build": "tsx scripts/export-build.ts",
     "sync:item-catalog": "tsx scripts/sync-item-catalog.ts",

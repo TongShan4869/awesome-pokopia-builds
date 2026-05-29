@@ -14,6 +14,7 @@ export interface ItemGuess {
 
 export interface FrameAnalysis {
   frame: string;
+  sourceTimeSeconds?: number;
   width: number;
   height: number;
   fileSizeBytes: number;

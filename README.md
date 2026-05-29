@@ -37,7 +37,24 @@ Capture frames from a source link:
 corepack pnpm ingest "https://www.youtube.com/watch?v=V2PGF9Rfc8Q"
 ```
 
-The ingest command captures candidate frames, scores them with local visual heuristics, auto-selects the strongest screenshot candidate, and fills any source metadata it can find. Review the generated file in `curation/{slug}.json` and open the selected image plus any close runners-up in `curation/{slug}/frames/`. These files are tracked so future curation work can see the original candidates and review trail, but they are not part of the rendered Astro site.
+The ingest command scans the video for likely showcase moments, captures timestamped candidate frames, scores them with local visual heuristics, auto-selects the strongest screenshot candidate, and fills any source metadata it can find. Review the generated file in `curation/{slug}.json` and open the selected image plus any close runners-up in `curation/{slug}/frames/`. These files are tracked so future curation work can see the original candidates and review trail, but they are not part of the rendered Astro site.
+
+If YouTube headless capture returns blank/player-shell frames, use the real Chrome fallback. Open the video in Chrome, seek to a completed-build showcase frame, wait for YouTube controls to fade, then capture the visible player crop:
+
+```bash
+corepack pnpm capture-chrome-frame "{slug}" --time=0
+```
+
+The default crop is tuned for the current Chrome window layout (`15,220,925,405`), which avoids the YouTube header and controls. Override it with `--rect=x,y,width,height` if Chrome is positioned differently. This updates `selectedFrame`, prepends the screenshot to `frames`, and records that the frame came from a curator-selected real-Chrome capture.
+
+For faster review, let the helper timestamp-hop in Chrome and capture after a short settle:
+
+```bash
+corepack pnpm capture-chrome-frame "{slug}" --open-source --time=0 --name=chrome-start.png --settle-ms=1400
+corepack pnpm capture-chrome-frame "{slug}" --open-source --time=416 --name=chrome-final-tour.png --settle-ms=1400
+```
+
+Use `--toggle-mute` once if the YouTube tab is audible. It sends YouTube's `m` shortcut, so only use it when sound is currently on. The screenshot crop still needs the Chrome window visible; true background capture would need a separate browser/media-stream path.
 
 The screenshot check is manual and strict:
 

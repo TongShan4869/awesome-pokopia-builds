@@ -1,4 +1,4 @@
-import { existsSync, statSync } from "node:fs";
+import { existsSync, rmSync, statSync, unlinkSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { chromium, type Page } from "playwright";
@@ -38,6 +38,9 @@ if (existsSync(outputPath) && !force) {
   process.exit(1);
 }
 
+if (force && existsSync(framesDir)) {
+  rmSync(framesDir, { recursive: true, force: true });
+}
 await ensureDir(framesDir);
 
 let pageTitle = "Untitled Pokopia build";
@@ -48,7 +51,10 @@ let sourceAuthor = "";
 let sourceAuthorUrl = "";
 let sourcePublishedAt = "";
 let frameAnalyses: FrameAnalysis[] = [];
+let sourceDurationSeconds = 0;
+let shouldTryBrowserFallback = true;
 const capturedFrames: string[] = [];
+const frameSourceTimes = new Map<string, number>();
 
 try {
   const browser = await chromium.launch({ headless: true });
@@ -71,11 +77,14 @@ try {
   sourceAuthor = metadata.sourceAuthor;
   sourceAuthorUrl = metadata.sourceAuthorUrl;
   sourcePublishedAt = metadata.sourcePublishedAt;
+  sourceDurationSeconds = await getVideoDurationSeconds(page);
 
   const youTubeId = platform === "youtube" ? getYouTubeId(url) : null;
   if (youTubeId) {
-    const sampleTimes = [4, 10, 18, 30, 45, 60, 78, 96];
+    shouldTryBrowserFallback = false;
+    const sampleTimes = buildShowcaseSampleTimes(sourceDurationSeconds);
     let candidateIndex = 1;
+    let consecutiveInvalidCaptures = 0;
     for (const time of sampleTimes) {
       const candidatePath = path.join(framesDir, `candidate-${candidateIndex}.png`);
       const timedUrl = `https://www.youtube.com/watch?v=${youTubeId}&t=${time}s`;
@@ -83,26 +92,37 @@ try {
       const videoFrame = await waitForPlayableVideo(page, time);
       if (videoFrame) {
         await videoFrame.screenshot({ path: candidatePath });
-        const analysis = await analyzeFrames(page, [path.relative(process.cwd(), candidatePath)]);
+        const relativeCandidatePath = path.relative(process.cwd(), candidatePath);
+        frameSourceTimes.set(relativeCandidatePath, time);
+        const analysis = await analyzeFrames(page, [relativeCandidatePath], frameSourceTimes, sourceDurationSeconds);
         if (analysis[0] && !analysis[0].rejected) {
-          capturedFrames.push(path.relative(process.cwd(), candidatePath));
+          capturedFrames.push(relativeCandidatePath);
           candidateIndex += 1;
+          consecutiveInvalidCaptures = 0;
         } else {
+          consecutiveInvalidCaptures += 1;
+          unlinkIfExists(candidatePath);
+          frameSourceTimes.delete(relativeCandidatePath);
           captureNote += `\nRejected YouTube timestamp ${time}s because the capture looked invalid: ${
             analysis[0]?.reasons.join(", ") ?? "unknown reason"
           }.`;
+          if (consecutiveInvalidCaptures >= 3 && capturedFrames.length === 0) {
+            captureNote +=
+              "\nStopped YouTube browser capture early after repeated invalid player screenshots.";
+            break;
+          }
         }
       } else {
         captureNote += `\nSkipped YouTube timestamp ${time}s because no playable video frame became visible.`;
       }
     }
     if (capturedFrames.length === 0) {
-      await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30_000 });
-      await page.waitForTimeout(4500);
+      captureNote +=
+        "\nNo usable YouTube frames were captured from the browser player. Try importing a manual screenshot or rerun with a media-stream capture method.";
     }
   }
 
-  const video = capturedFrames.length === 0 ? page.locator("video").first() : null;
+  const video = shouldTryBrowserFallback && capturedFrames.length === 0 ? page.locator("video").first() : null;
   const videoBox = video ? await video.boundingBox().catch(() => null) : null;
   if (capturedFrames.length === 0 && video && videoBox && videoBox.width > 240 && videoBox.height > 180) {
     const duration = await video
@@ -141,18 +161,22 @@ try {
       await page.waitForTimeout(700);
       const candidatePath = path.join(framesDir, `candidate-${index + 1}.png`);
       await video.screenshot({ path: candidatePath });
-      capturedFrames.push(path.relative(process.cwd(), candidatePath));
+      const relativeCandidatePath = path.relative(process.cwd(), candidatePath);
+      frameSourceTimes.set(relativeCandidatePath, time);
+      capturedFrames.push(relativeCandidatePath);
     }
 
     if (capturedFrames.length === 0) {
       await video.screenshot({ path: firstFramePath });
+      frameSourceTimes.set(firstRelativeFramePath, 0);
       capturedFrames.push(firstRelativeFramePath);
     }
-  } else if (capturedFrames.length === 0) {
+  } else if (shouldTryBrowserFallback && capturedFrames.length === 0) {
     await page.screenshot({ path: firstFramePath, fullPage: false });
+    frameSourceTimes.set(firstRelativeFramePath, 0);
     capturedFrames.push(firstRelativeFramePath);
   }
-  frameAnalyses = await analyzeFrames(page, capturedFrames);
+  frameAnalyses = await analyzeFrames(page, capturedFrames, frameSourceTimes, sourceDurationSeconds);
   await browser.close();
 } catch (error) {
   captureNote =
@@ -187,7 +211,7 @@ const inferredItems: ItemGuess[] = itemDb
   .map((item) => ({
     name: item.name,
     confidence: 0.35,
-    evidenceFrame: firstRelativeFramePath,
+    evidenceFrame: capturedFrames[0],
     note: "Matched by title/page text. Review visually before exporting.",
   }));
 
@@ -198,6 +222,8 @@ Use data/pokopia-item-catalog.json as the item vocabulary when present, falling 
 Keep confidence and rejected guesses in this private curation JSON only. Do not publish confidence scores to the website.
 Pick selectedFrame only after visually confirming it shows the complete build, not the intro, creator face, UI chrome, or a transition.
 The script auto-picked selectedFrame from frameAnalyses; treat that as a ranked suggestion, not a final visual review.
+Prefer frames that show a finished whole build, usually showcase or recap moments near the beginning or end of a video.
+For compilation videos, use sourceTimeSeconds to identify separate builds and pick the strongest full-building frame for each useful entry.
 
 First item database entries:
 ${itemsExcerpt}`;
@@ -213,8 +239,8 @@ const draft: CurationDraft = {
   platform,
   creator: sourceAuthor || "Unknown creator",
   capturedAt: new Date().toISOString(),
-  selectedFrame: pickSelectedFrame(frameAnalyses, capturedFrames[0] ?? firstRelativeFramePath),
-  frames: capturedFrames.length > 0 ? capturedFrames : [firstRelativeFramePath],
+  selectedFrame: capturedFrames.length > 0 ? pickSelectedFrame(frameAnalyses, capturedFrames[0]) : "",
+  frames: capturedFrames,
   tags: ["cozy"],
   summary: "A Pokopia build saved from a social video. Review this summary before exporting.",
   publicNotes: captureNote
@@ -238,8 +264,8 @@ const draft: CurationDraft = {
 await writeJson(outputPath, draft);
 
 console.log(`Draft curation written: ${outputPath}`);
-console.log(`Frame candidates: ${draft.frames.join(", ")}`);
-console.log(`Auto-selected frame: ${draft.selectedFrame}`);
+console.log(`Frame candidates: ${draft.frames.length ? draft.frames.join(", ") : "none"}`);
+console.log(`Auto-selected frame: ${draft.selectedFrame || "none"}`);
 if (draft.automationNotes?.length) {
   console.log("Automation notes:");
   for (const note of draft.automationNotes) console.log(`- ${note}`);
@@ -345,7 +371,68 @@ async function waitForPlayableVideo(page: Page, targetTime: number) {
   return null;
 }
 
-async function analyzeFrames(page: Page, frames: string[]): Promise<FrameAnalysis[]> {
+async function getVideoDurationSeconds(page: Page) {
+  return page
+    .evaluate(() => {
+      const video = document.querySelector("video");
+      if (video instanceof HTMLVideoElement && Number.isFinite(video.duration) && video.duration > 0) {
+        return video.duration;
+      }
+
+      const durationMeta = document
+        .querySelector('meta[itemprop="duration"], meta[property="video:duration"], meta[name="duration"]')
+        ?.getAttribute("content");
+      if (!durationMeta) return 0;
+      const numericDuration = Number(durationMeta);
+      if (Number.isFinite(numericDuration)) return numericDuration;
+      const match = durationMeta.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/i);
+      if (!match) return 0;
+      return Number(match[1] ?? 0) * 3600 + Number(match[2] ?? 0) * 60 + Number(match[3] ?? 0);
+    })
+    .catch(() => 0);
+}
+
+function buildShowcaseSampleTimes(durationSeconds: number) {
+  if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+    return [6, 12, 20, 32, 48, 66, 88, 115, 150, 190, 240, 300];
+  }
+
+  const duration = Math.max(12, Math.floor(durationSeconds));
+  const proportionalTimes = [
+    0.04,
+    0.08,
+    0.12,
+    0.18,
+    0.25,
+    0.33,
+    0.42,
+    0.5,
+    0.58,
+    0.66,
+    0.72,
+    0.78,
+    0.84,
+    0.9,
+    0.94,
+    0.97,
+  ].map((portion) => Math.round(duration * portion));
+
+  const endWindowStart = Math.max(8, duration - 90);
+  const endWindow = [endWindowStart, duration - 60, duration - 40, duration - 25, duration - 12];
+
+  return Array.from(
+    new Set([...proportionalTimes, ...endWindow].filter((time) => time > 2 && time < duration - 2).map(Math.round)),
+  )
+    .sort((a, b) => a - b)
+    .slice(0, 24);
+}
+
+async function analyzeFrames(
+  page: Page,
+  frames: string[],
+  sourceTimes = new Map<string, number>(),
+  durationSeconds = 0,
+): Promise<FrameAnalysis[]> {
   const analyses: FrameAnalysis[] = [];
   for (const frame of frames) {
     const absolutePath = path.join(process.cwd(), frame);
@@ -445,7 +532,24 @@ async function analyzeFrames(page: Page, frames: string[]): Promise<FrameAnalysi
     const detailScore = Math.min(1, metrics.edgeScore / 48);
     const varianceScore = Math.min(1, metrics.variance / 3200);
     const colorScore = Math.min(1, metrics.colorfulness / 48);
+    const sourceTimeSeconds = sourceTimes.get(frame);
     let score = normalizedSize * 0.35 + detailScore * 0.3 + varianceScore * 0.2 + colorScore * 0.15;
+
+    if (sourceTimeSeconds !== undefined && durationSeconds > 0) {
+      const progress = sourceTimeSeconds / durationSeconds;
+      if (progress < 0.15) {
+        score += 0.04;
+        reasons.push("early-video showcase zone");
+      }
+      if (progress > 0.65) {
+        score += 0.12;
+        reasons.push("late-video showcase zone");
+      }
+      if (progress > 0.85) {
+        score += 0.08;
+        reasons.push("end recap zone");
+      }
+    }
 
     if (metrics.width < 480 || metrics.height < 270) {
       score -= 0.2;
@@ -489,6 +593,7 @@ async function analyzeFrames(page: Page, frames: string[]): Promise<FrameAnalysi
 
     analyses.push({
       frame,
+      sourceTimeSeconds,
       width: metrics.width,
       height: metrics.height,
       fileSizeBytes,
@@ -508,8 +613,10 @@ function pickSelectedFrame(analyses: FrameAnalysis[], fallback: string) {
 function buildAutomationNotes(analyses: FrameAnalysis[], author: string, note: string) {
   const notes: string[] = [];
   if (analyses[0]) {
+    const timestamp =
+      analyses[0].sourceTimeSeconds === undefined ? "" : ` at ${formatTimestamp(analyses[0].sourceTimeSeconds)}`;
     notes.push(
-      `Top ranked frame is ${analyses[0].frame} with score ${analyses[0].score} (${analyses[0].reasons.join(", ")}).`,
+      `Top ranked frame is ${analyses[0].frame}${timestamp} with score ${analyses[0].score} (${analyses[0].reasons.join(", ")}).`,
     );
   }
   const rejectedCount = analyses.filter((analysis) => analysis.rejected).length;
@@ -523,4 +630,19 @@ function buildAutomationNotes(analyses: FrameAnalysis[], author: string, note: s
     notes.push("Capture produced warnings; review publicNotes before publishing.");
   }
   return notes;
+}
+
+function formatTimestamp(seconds: number) {
+  const rounded = Math.max(0, Math.round(seconds));
+  const minutes = Math.floor(rounded / 60);
+  const remainingSeconds = rounded % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+}
+
+function unlinkIfExists(filePath: string) {
+  try {
+    if (existsSync(filePath)) unlinkSync(filePath);
+  } catch {
+    // Best-effort cleanup only; stale rejected frames are still marked invalid in JSON.
+  }
 }
