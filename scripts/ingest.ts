@@ -224,6 +224,7 @@ Pick selectedFrame only after visually confirming it shows the complete build, n
 The script auto-picked selectedFrame from frameAnalyses; treat that as a ranked suggestion, not a final visual review.
 Prefer frames that show a finished whole build, usually showcase or recap moments near the beginning or end of a video.
 For compilation videos, use sourceTimeSeconds to identify separate builds and pick the strongest full-building frame for each useful entry.
+Also look for explicit item/material list frames such as "recommended items", "materials", or "what I used". Keep those as item-evidence frames even when they are not suitable hero screenshots.
 
 First item database entries:
 ${itemsExcerpt}`;

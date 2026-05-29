@@ -60,6 +60,7 @@ The screenshot check is manual and strict:
 
 - Reject creator intro frames, UI chrome, blank pages, loading shells, and transitions.
 - Choose a `selectedFrame` only when the build itself is clearly visible.
+- Keep explicit "recommended items", "materials", or "what I used" frames as item evidence, even when they are not suitable hero images.
 - Edit inferred items and public notes.
 - Set `reviewState` to `"reviewed"` only after that visual check.
 
