@@ -1,0 +1,168 @@
+{
+  "slug": "www-youtube-com-watch-v-v2pgf9rfc8q",
+  "title": "These Pokopia Builds Shouldn't Exist...",
+  "sourceUrl": "https://www.youtube.com/watch?v=V2PGF9Rfc8Q",
+  "platform": "youtube",
+  "creator": "おにぎり (@onigiri_DQB)",
+  "capturedAt": "2026-05-28T03:00:35.414Z",
+  "selectedFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+  "frames": [
+    "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+    "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/candidate-1.png",
+    "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/candidate-2.png",
+    "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/candidate-3.png",
+    "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/candidate-4.png",
+    "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/candidate-5.png",
+    "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/candidate-6.png",
+    "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/candidate-7.png"
+  ],
+  "tags": [
+    "stacked town",
+    "canal",
+    "pastel",
+    "market street"
+  ],
+  "summary": "A stacked pastel canal town with terraced homes, balconies, string lights, palms, and a little waterway plaza.",
+  "publicNotes": "## Build notes\n\nThis full-build frame is the kind of hero screenshot the gallery should preserve: the whole composition is visible at once, with stacked pastel homes, roof gardens, stairs, lamps, balconies, and a canal cutting through the foreground.\n\nThe strongest design move is the vertical town layout. Each roof becomes another terrace, so the build reads like a compact seaside neighborhood instead of a single house. The water channel and stone wall give the scene a clean base, while the banners, awnings, plants, and warm lighting make it feel lived in.",
+  "aiReviewPrompt": "Review the captured frames in curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames for a Pokemon Pokopia build.\n\nUse data/pokopia-item-catalog.json as the item vocabulary when present. Suggest likely exact item names, tags, and a short public summary. Keep confidence and rejected guesses in this private curation JSON only. Do not publish confidence scores to the website.",
+  "inferredItems": [
+    {
+      "name": "Stone steps",
+      "confidence": 0.92,
+      "image": "/images/items/stonesteps.png",
+      "evidence": "Stacked gray steps are visible on the canal terraces and right-side stair run.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Arch bridge",
+      "confidence": 0.86,
+      "image": "/images/items/archbridge.png",
+      "evidence": "A gray arched opening bridges the right-side waterway edge.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Harbor streetlight",
+      "confidence": 0.82,
+      "image": "/images/items/harborstreetlight.png",
+      "evidence": "Multiple waterfront lamps match the harbor-style streetlight silhouette.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Stone fencing",
+      "confidence": 0.8,
+      "image": "/images/items/stonefencing.png",
+      "evidence": "Short gray fence posts line the canal-facing promenade.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Planter",
+      "confidence": 0.78,
+      "image": "/images/items/planter.png",
+      "evidence": "Small planted pots and balcony planters appear across the houses.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Glass window",
+      "confidence": 0.76,
+      "image": "/images/items/glasswindow.png",
+      "evidence": "Simple square windows repeat across the pastel walls.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Sash window",
+      "confidence": 0.62,
+      "image": "/images/items/sashwindow.png",
+      "evidence": "Some taller cross-trim windows resemble sash windows, though the frame is small.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Plaster wall",
+      "confidence": 0.74,
+      "image": "/images/items/plasterwall.png",
+      "evidence": "Cream and pale wall blocks match the plaster-wall family.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Painted wall",
+      "confidence": 0.72,
+      "image": "/images/items/paintedwall.png",
+      "evidence": "Blue, pink, coral, and teal painted exterior blocks are used throughout the stacked town.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Light wooden wall",
+      "confidence": 0.7,
+      "image": "/images/items/lightwoodenwall.png",
+      "evidence": "Wood-grain sections and balcony trim appear on the middle buildings.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Flat tiled roof",
+      "confidence": 0.82,
+      "image": "/images/items/flattiledroof.png",
+      "evidence": "Flat red and green roof caps sit on several pastel buildings.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Sloped tiled roof",
+      "confidence": 0.58,
+      "image": "/images/items/slopedtiledroof.png",
+      "evidence": "Some roof edges and awning-like roof pieces suggest sloped tiled roof parts.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Glossy awning",
+      "confidence": 0.68,
+      "image": "/images/items/glossyawning.png",
+      "evidence": "Cream awnings shade the market-street windows and stalls.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Square tiling",
+      "confidence": 0.78,
+      "image": "/images/items/squaretiling.png",
+      "evidence": "Large square paving tiles cover the canal promenade and plaza surfaces.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Stone tiling",
+      "confidence": 0.7,
+      "image": "/images/items/stonetiling.png",
+      "evidence": "Gray stone-tile surfaces appear around the water and raised terrace.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Levee",
+      "confidence": 0.84,
+      "image": "/images/items/levee.png",
+      "evidence": "The canal is held by blocky water-retaining walls on both sides.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Foundation",
+      "confidence": 0.76,
+      "image": "/images/items/foundation.png",
+      "evidence": "The build sits on broad gray stone-and-concrete base blocks.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-v2pgf9rfc8q/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    }
+  ],
+  "rejectedItems": [],
+  "reviewState": "reviewed"
+}

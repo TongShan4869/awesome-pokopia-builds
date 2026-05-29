@@ -20,7 +20,6 @@ const displayedItems =
     : build.data.items.map((item) => ({
         name: item,
         image: "",
-        confidence: undefined,
         evidence: undefined,
       }));
 const catalogByName = new Map(catalog.items.map((item) => [item.name, item]));

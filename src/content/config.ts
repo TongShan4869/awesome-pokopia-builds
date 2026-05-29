@@ -28,7 +28,6 @@ const builds = defineCollection({
         z.object({
           name: z.string(),
           image: z.string(),
-          confidence: z.number().min(0).max(1).optional(),
           evidence: z.string().optional(),
         }),
       )

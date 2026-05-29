@@ -32,7 +32,6 @@ const publicItems = draft.inferredItems.map((item) => item.name);
 const publicInferredItems = draft.inferredItems.map((item) => ({
   name: item.name,
   image: item.image ?? itemLookup.get(item.name.toLowerCase())?.image ?? "",
-  confidence: item.confidence,
   evidence: item.evidence ?? item.note ?? itemLookup.get(item.name.toLowerCase())?.description,
 }));
 const mdx = `---

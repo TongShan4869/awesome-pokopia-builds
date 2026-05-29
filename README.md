@@ -2,7 +2,7 @@
 
 A cute, public gallery of inspiring Pokemon Pokopia builds from social videos.
 
-This repo stores source links, screenshots, public summaries, and curated item notes. It does **not** store copied full videos. Raw AI analysis, confidence scores, and review notes stay local in `curation/`, which is ignored by git.
+This repo stores source links, screenshots, public summaries, curated item notes, and the AI-assisted ingestion drafts in `curation/`. It does **not** store copied full videos. Raw confidence scores and review notes are kept in the repository for curator history, but only reviewed MDX content and public images are used by the website.
 
 ## What lives here
 
@@ -11,6 +11,7 @@ This repo stores source links, screenshots, public summaries, and curated item n
 - `data/pokopia-item-catalog.json` - local item catalog for exact item-name inference
 - `data/items.json` - small fallback item database maintained by the curator
 - `public/images/items/*.png` - local item figure copies used by build pages
+- `curation/*.json` and `curation/*/frames/*` - tracked ingestion drafts, frame candidates, review notes, and AI confidence data
 - `scripts/ingest.ts` - local-only browser capture workflow for social links
 - `scripts/export-build.ts` - converts reviewed curation data into public MDX
 - `scripts/sync-item-catalog.ts` - refreshes the local item catalog and item figures
@@ -36,7 +37,7 @@ Capture frames from a source link:
 corepack pnpm ingest "https://www.youtube.com/watch?v=V2PGF9Rfc8Q"
 ```
 
-Review the generated file in `curation/{slug}.json` and open every image in `curation/{slug}/frames/`.
+Review the generated file in `curation/{slug}.json` and open every image in `curation/{slug}/frames/`. These files are tracked so future curation work can see the original candidates and review trail, but they are not part of the rendered Astro site.
 
 The screenshot check is manual and strict:
 
