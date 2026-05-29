@@ -37,7 +37,7 @@ Capture frames from a source link:
 corepack pnpm ingest "https://www.youtube.com/watch?v=V2PGF9Rfc8Q"
 ```
 
-Review the generated file in `curation/{slug}.json` and open every image in `curation/{slug}/frames/`. These files are tracked so future curation work can see the original candidates and review trail, but they are not part of the rendered Astro site.
+The ingest command captures candidate frames, scores them with local visual heuristics, auto-selects the strongest screenshot candidate, and fills any source metadata it can find. Review the generated file in `curation/{slug}.json` and open the selected image plus any close runners-up in `curation/{slug}/frames/`. These files are tracked so future curation work can see the original candidates and review trail, but they are not part of the rendered Astro site.
 
 The screenshot check is manual and strict:
 

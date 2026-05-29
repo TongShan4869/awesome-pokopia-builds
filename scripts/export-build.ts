@@ -34,9 +34,19 @@ const publicInferredItems = draft.inferredItems.map((item) => ({
   image: item.image ?? itemLookup.get(item.name.toLowerCase())?.image ?? "",
   evidence: item.evidence ?? item.note ?? itemLookup.get(item.name.toLowerCase())?.description,
 }));
+const sourceMetadataLines = [
+  ["sourceTitle", draft.sourceTitle ?? draft.title],
+  ["sourceAuthor", draft.sourceAuthor],
+  ["sourceAuthorUrl", draft.sourceAuthorUrl],
+  ["sourcePublishedAt", draft.sourcePublishedAt],
+]
+  .filter((entry): entry is [string, string] => typeof entry[1] === "string" && entry[1].length > 0)
+  .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
+  .join("\n");
 const mdx = `---
 title: ${JSON.stringify(draft.title)}
 sourceUrl: ${JSON.stringify(draft.sourceUrl)}
+${sourceMetadataLines}
 platform: ${JSON.stringify(draft.platform)}
 creator: ${JSON.stringify(draft.creator)}
 heroImage: ${JSON.stringify(`/images/builds/${draft.slug}/hero.png`)}

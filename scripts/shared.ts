@@ -12,10 +12,32 @@ export interface ItemGuess {
   note?: string;
 }
 
+export interface FrameAnalysis {
+  frame: string;
+  width: number;
+  height: number;
+  fileSizeBytes: number;
+  score: number;
+  reasons: string[];
+  rejected: boolean;
+}
+
+export interface ReviewChecklist {
+  selectedFrameAutoPicked: boolean;
+  selectedFrameNeedsHumanCheck: boolean;
+  sourceMetadataNeedsHumanCheck: boolean;
+  itemsNeedVisualReview: boolean;
+  notesNeedRewrite: boolean;
+}
+
 export interface CurationDraft {
   slug: string;
   title: string;
   sourceUrl: string;
+  sourceTitle?: string;
+  sourceAuthor?: string;
+  sourceAuthorUrl?: string;
+  sourcePublishedAt?: string;
   platform: Platform;
   creator: string;
   capturedAt: string;
@@ -25,6 +47,9 @@ export interface CurationDraft {
   summary: string;
   publicNotes: string;
   aiReviewPrompt: string;
+  automationNotes?: string[];
+  frameAnalyses?: FrameAnalysis[];
+  reviewChecklist?: ReviewChecklist;
   inferredItems: ItemGuess[];
   rejectedItems: ItemGuess[];
   reviewState: "draft" | "reviewed";
