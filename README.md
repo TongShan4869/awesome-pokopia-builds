@@ -68,6 +68,17 @@ The screenshot check is manual and strict:
 - Edit inferred items and public notes.
 - Set `reviewState` to `"reviewed"` only after that visual check.
 
+After every draft ingest, provide the curator with a review packet instead of only reporting the
+generated file path. The packet should include:
+
+- A link to the selected hero frame and a request to confirm or replace it.
+- Suggested public title, tags, summary, and build notes.
+- A shortlist of high-confidence visible catalog items.
+- A separate "please verify" list for uncertain item matches and any automated guesses to reject.
+- Source URL and creator metadata.
+- A clear prompt to reply with approval or corrections. On approval, update the draft to
+  `reviewState: "reviewed"` and export the build.
+
 If you already have the right screenshot, import it directly:
 
 ```bash
