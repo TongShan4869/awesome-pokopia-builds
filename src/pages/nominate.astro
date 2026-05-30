@@ -1,0 +1,207 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const basePath = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const repoUrl =
+  import.meta.env.PUBLIC_REPO_URL || "https://github.com/TongShan4869/awesome-pokopia-builds";
+const repoPath = repoUrl.replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, "");
+const issueUrl = `https://github.com/${repoPath}/issues/new`;
+---
+
+<BaseLayout
+  title="Nominate a build | awesome-pokopia-builds"
+  description="Send a Pokopia build link and short description for curator review."
+>
+  <main class="detail-shell nomination-shell">
+    <a class="back-link" href={basePath}><span aria-hidden="true">←</span> Gallery</a>
+
+    <section class="nomination-hero">
+      <div>
+        <p class="eyebrow">Community nominations</p>
+        <h1>Nominate a build</h1>
+        <p>
+          Send us the source link and a short description. Curators review nominations in batches,
+          run the local data processing workflow, and publish only the finished gallery pages.
+        </p>
+      </div>
+    </section>
+
+    <section class="nomination-grid" aria-label="Build nomination">
+      <form class="nomination-form" action={issueUrl} method="get">
+        <input type="hidden" name="title" value="Build nomination" data-nomination-title />
+        <input
+          type="hidden"
+          name="labels"
+          value="build nomination,curation"
+        />
+        <textarea name="body" data-nomination-body hidden>
+## Source link
+
+## Build description
+
+## Curator notes
+- Submitted from the website nomination form.
+- Review locally before publishing.
+        </textarea>
+
+        <label>
+          <span>Source link</span>
+          <input
+            type="url"
+            inputmode="url"
+            placeholder="https://www.youtube.com/watch?v=..."
+            autocomplete="url"
+            required
+            aria-describedby="source-url-help"
+            data-source-url
+          />
+          <small id="source-url-help" class="field-help" data-source-url-help>
+            Use an HTTPS YouTube, TikTok, Instagram, or Reddit link.
+          </small>
+        </label>
+
+        <label>
+          <span>Description</span>
+          <textarea
+            rows="7"
+            maxlength="1200"
+            placeholder="What makes this build worth curating? Mention the creator, theme, standout rooms, or useful item details."
+            required
+            data-build-description
+          ></textarea>
+        </label>
+
+        <button class="button primary" type="submit">Open nomination issue</button>
+      </form>
+
+      <aside class="nomination-notes" aria-label="What happens next">
+        <p class="eyebrow">Curated, not automatic</p>
+        <h2>What happens next</h2>
+        <ol>
+          <li>We receive the nomination as a GitHub issue.</li>
+          <li>The form rejects non-HTTPS links and unsupported domains.</li>
+          <li>Curators batch-review links and screenshots locally.</li>
+          <li>Reviewed builds are exported into the public gallery.</li>
+        </ol>
+        <p>
+          Nominations are suggestions, so submitting one will not publish anything directly.
+        </p>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const form = document.querySelector(".nomination-form");
+    const sourceInput = form?.querySelector("[data-source-url]");
+    const sourceHelp = form?.querySelector("[data-source-url-help]");
+    const descriptionInput = form?.querySelector("[data-build-description]");
+    const titleInput = form?.querySelector("[data-nomination-title]");
+    const bodyInput = form?.querySelector("[data-nomination-body]");
+    const allowedHosts = new Set([
+      "instagram.com",
+      "m.instagram.com",
+      "m.reddit.com",
+      "old.reddit.com",
+      "reddit.com",
+      "tiktok.com",
+      "vm.tiktok.com",
+      "vt.tiktok.com",
+      "www.instagram.com",
+      "www.reddit.com",
+      "www.tiktok.com",
+      "www.youtube.com",
+      "youtube.com",
+      "youtu.be",
+    ]);
+
+    const getLinkStatus = (value: string) => {
+      const trimmedValue = value.trim();
+
+      if (!trimmedValue) {
+        return {
+          ok: true,
+          host: "",
+          message: "Use an HTTPS YouTube, TikTok, Instagram, or Reddit link.",
+        };
+      }
+
+      try {
+        const url = new URL(trimmedValue);
+        const host = url.hostname.toLowerCase();
+
+        if (url.protocol !== "https:") {
+          return {
+            ok: false,
+            host,
+            message: "Use an HTTPS link so curators are not sent to an insecure page.",
+          };
+        }
+
+        if (!allowedHosts.has(host)) {
+          return {
+            ok: false,
+            host,
+            message: "This gallery only accepts YouTube, TikTok, Instagram, or Reddit source links.",
+          };
+        }
+
+        return {
+          ok: true,
+          host,
+          message: `Accepted source domain: ${host}`,
+        };
+      } catch {
+        return {
+          ok: false,
+          host: "",
+          message: "Enter a complete source link, including https://",
+        };
+      }
+    };
+
+    const updateIssueFields = () => {
+      if (
+        !(sourceInput instanceof HTMLInputElement) ||
+        !(sourceHelp instanceof HTMLElement) ||
+        !(descriptionInput instanceof HTMLTextAreaElement) ||
+        !(titleInput instanceof HTMLInputElement) ||
+        !(bodyInput instanceof HTMLTextAreaElement)
+      ) {
+        return;
+      }
+
+      const sourceUrl = sourceInput.value.trim();
+      const description = descriptionInput.value.trim();
+      const linkStatus = getLinkStatus(sourceUrl);
+
+      sourceInput.setCustomValidity(linkStatus.ok ? "" : linkStatus.message);
+      sourceInput.dataset.securityStatus = linkStatus.ok ? "safe" : "blocked";
+      sourceHelp.textContent = linkStatus.message;
+      sourceHelp.dataset.securityStatus = linkStatus.ok ? "safe" : "blocked";
+
+      titleInput.value = sourceUrl ? `Build nomination: ${sourceUrl}` : "Build nomination";
+      bodyInput.value = `## Source link
+\`\`\`
+${sourceUrl || "Paste the original social/video link here."}
+\`\`\`
+
+## Source domain
+${linkStatus.host || "_Waiting for source link._"}
+
+## Build description
+${description || "_Describe why this build should be curated._"}
+
+## Curator notes
+- Submitted from the website nomination form.
+- The website checked for HTTPS and an allowed source domain before submission.
+- Review locally before publishing.`;
+    };
+
+    sourceInput?.addEventListener("input", updateIssueFields);
+    descriptionInput?.addEventListener("input", updateIssueFields);
+    form?.addEventListener("submit", updateIssueFields);
+    updateIssueFields();
+  </script>
+</BaseLayout>
