@@ -174,8 +174,14 @@ p {
 }
 
 .hero-actions {
+  justify-content: center;
   flex-wrap: nowrap;
   gap: 0.4rem;
+}
+
+.hero-actions .button {
+  padding-inline: 0.85rem;
+  white-space: nowrap;
 }
 
 .button {
@@ -187,13 +193,6 @@ p {
   padding: 0.78rem 1.1rem;
   font-weight: 900;
   text-decoration: none;
-}
-
-.hero-actions .button {
-  min-height: 38px;
-  padding: 0.58rem 0.72rem;
-  font-size: 0.78rem;
-  white-space: nowrap;
 }
 
 .button.primary {
@@ -999,6 +998,7 @@ p {
 
 @media (max-width: 860px) {
   .hero-actions {
+    justify-content: flex-start;
     flex-wrap: wrap;
     gap: 0.65rem;
   }
