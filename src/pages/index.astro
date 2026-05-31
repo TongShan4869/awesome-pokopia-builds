@@ -2,7 +2,6 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import catalog from "../../data/pokopia-item-catalog.json";
-import { tagSlug } from "../utils/tags";
 
 const builds = (await getCollection("builds")).sort((a, b) =>
   a.data.title.localeCompare(b.data.title),
@@ -36,8 +35,8 @@ const repoUrl =
         <p class="eyebrow">Pokopia build scrapbook</p>
         <h1>Awesome Pokopia Builds</h1>
         <p class="hero-text">
-          A curated gallery of Pokopia builds discovered in social videos, with screenshots,
-          creator credit, and clean item notes for later remixing.
+          A gallery of awesome Pokemon Pokopia's builds discovered in social media, with item notes
+          for later remixing.
         </p>
         <div class="hero-actions">
           <a class="button primary" href="#gallery">Browse builds</a>
@@ -75,10 +74,10 @@ const repoUrl =
       <section class="catalog-preview" aria-label="Item catalog preview">
         <div>
           <p class="eyebrow">Item reference</p>
-          <h2>Exact item figures for visual inventory notes.</h2>
+          <h2>Items list for visual inventory notes</h2>
           <p>
-            The gallery can pair builds with precise item names and figures, so screenshot notes
-            become useful reference material instead of loose material guesses.
+            Browse item names and figures alongside builds to create useful visual inventory notes
+            for later reference.
           </p>
         </div>
         <a class="button primary" href={`${basePath}items/`}>Open catalog</a>
@@ -87,20 +86,35 @@ const repoUrl =
       <section class="catalog-preview" aria-label="Build nominations">
         <div>
           <p class="eyebrow">Know a great build?</p>
-          <h2>Send a link for the curator batch.</h2>
+          <h2>Send a link for the curator batch</h2>
           <p>
-            Visitors can nominate builds with a source link and short description. We still handle
-            screenshots, item notes, data processing, and publishing locally.
+            Found a build you love? Send over the source link and a short note, and we'll take it
+            from there.
           </p>
         </div>
         <a class="button primary" href={`${basePath}nominate/`}>Nominate build</a>
       </section>
     </div>
 
-    {allTags.length > 0 && (
-      <section class="tag-ribbon" aria-label="Build themes">
-        {allTags.map((tag) => <a href={`${basePath}tags/${tagSlug(tag)}/`}>{tag}</a>)}
-      </section>
+    {builds.length > 0 && (
+      <>
+        <section class="catalog-controls build-controls" aria-label="Build filters">
+          <label>
+            <span>Search builds</span>
+            <input type="search" id="build-search" placeholder="Garden, cottage, market..." />
+          </label>
+          <label>
+            <span>Theme</span>
+            <select id="theme-filter">
+              <option value="">All themes</option>
+              {allTags.map((tag) => <option value={tag}>{tag}</option>)}
+            </select>
+          </label>
+        </section>
+        <p class="catalog-result-count build-result-count" id="build-result-count">
+          {builds.length} visible builds
+        </p>
+      </>
     )}
 
     <section id="gallery" class="gallery" aria-label="Pokopia build gallery">
@@ -115,7 +129,16 @@ const repoUrl =
         </div>
       ) : (
         builds.map((build) => (
-          <a class="build-card" href={`${basePath}builds/${build.slug}/`}>
+          <a
+            class="build-card"
+            href={`${basePath}builds/${build.slug}/`}
+            data-build-card
+            data-title={build.data.title.toLowerCase()}
+            data-summary={build.data.summary.toLowerCase()}
+            data-creator={build.data.creator.toLowerCase()}
+            data-platform={build.data.platform.toLowerCase()}
+            data-tags={JSON.stringify(build.data.tags.map((tag) => tag.toLowerCase()))}
+          >
             <img src={assetPath(build.data.heroImage)} alt={`${build.data.title} full build screenshot`} loading="lazy" />
             <div class="build-card-copy">
               <p>{build.data.platform} · {build.data.creator}</p>
@@ -130,4 +153,41 @@ const repoUrl =
       )}
     </section>
   </main>
+
+  <script>
+    const searchInput = document.querySelector<HTMLInputElement>("#build-search");
+    const themeFilter = document.querySelector<HTMLSelectElement>("#theme-filter");
+    const resultCount = document.querySelector<HTMLElement>("#build-result-count");
+    const cards = [...document.querySelectorAll<HTMLElement>("[data-build-card]")];
+
+    function updateGallery() {
+      const query = searchInput?.value.trim().toLowerCase() ?? "";
+      const theme = themeFilter?.value.toLowerCase() ?? "";
+      let visibleCount = 0;
+
+      for (const card of cards) {
+        const haystack = [
+          card.dataset.title,
+          card.dataset.summary,
+          card.dataset.creator,
+          card.dataset.platform,
+          card.dataset.tags,
+        ].join(" ");
+        const tags = JSON.parse(card.dataset.tags ?? "[]");
+        const matchesQuery = query === "" || haystack.includes(query);
+        const matchesTheme = theme === "" || tags.includes(theme);
+        const visible = matchesQuery && matchesTheme;
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      }
+
+      if (resultCount) {
+        resultCount.textContent = `${visibleCount} visible ${visibleCount === 1 ? "build" : "builds"}`;
+      }
+    }
+
+    searchInput?.addEventListener("input", updateGallery);
+    themeFilter?.addEventListener("change", updateGallery);
+    updateGallery();
+  </script>
 </BaseLayout>

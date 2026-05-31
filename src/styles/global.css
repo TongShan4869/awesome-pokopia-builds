@@ -173,6 +173,11 @@ p {
   gap: 0.65rem;
 }
 
+.hero-actions {
+  flex-wrap: nowrap;
+  gap: 0.4rem;
+}
+
 .button {
   display: inline-flex;
   min-height: 44px;
@@ -182,6 +187,13 @@ p {
   padding: 0.78rem 1.1rem;
   font-weight: 900;
   text-decoration: none;
+}
+
+.hero-actions .button {
+  min-height: 38px;
+  padding: 0.58rem 0.72rem;
+  font-size: 0.78rem;
+  white-space: nowrap;
 }
 
 .button.primary {
@@ -893,6 +905,11 @@ p {
   padding: 0.7rem 0.8rem;
 }
 
+.build-controls {
+  position: static;
+  margin-top: 2rem;
+}
+
 .catalog-section-ribbon {
   display: flex;
   flex-wrap: wrap;
@@ -981,6 +998,11 @@ p {
 }
 
 @media (max-width: 860px) {
+  .hero-actions {
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
   .hero,
   .detail-header,
   .detail-grid,
