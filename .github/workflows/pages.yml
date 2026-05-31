@@ -29,6 +29,8 @@ jobs:
       - uses: actions/configure-pages@v5
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+        env:
+          PUBLIC_FORMSPREE_ENDPOINT: ${{ vars.PUBLIC_FORMSPREE_ENDPOINT }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist

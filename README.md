@@ -37,9 +37,23 @@ Capture frames from a source link:
 corepack pnpm ingest "https://www.youtube.com/watch?v=V2PGF9Rfc8Q"
 ```
 
-Website visitors can nominate builds through `/nominate/`. The form opens a GitHub issue with
-the source link and description, but publishing remains curator-controlled: batch-review the
-nomination links locally, run the ingest workflow, then export only reviewed builds.
+Website visitors can nominate builds through `/nominate/`. The form stores the source link,
+description, and optional contact detail in Formspree, but publishing remains curator-controlled:
+batch-review the nomination links locally, run the ingest workflow, then export only reviewed
+builds.
+
+The nomination page defaults to the project's Formspree endpoint:
+
+```text
+https://formspree.io/f/xjgzdogw
+```
+
+To switch forms without editing the page, set the GitHub Actions repository variable
+`PUBLIC_FORMSPREE_ENDPOINT`. Local builds can use the same override:
+
+```bash
+PUBLIC_FORMSPREE_ENDPOINT="https://formspree.io/f/{form-id}" corepack pnpm build
+```
 
 The ingest command scans the video for likely showcase moments, captures timestamped candidate frames, scores them with local visual heuristics, auto-selects the strongest screenshot candidate, and fills any source metadata it can find. Review the generated file in `curation/{slug}.json` and open the selected image plus any close runners-up in `curation/{slug}/frames/`. These files are tracked so future curation work can see the original candidates and review trail, but they are not part of the rendered Astro site.
 

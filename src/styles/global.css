@@ -354,6 +354,10 @@ p {
   resize: vertical;
 }
 
+.nomination-honeypot {
+  display: none;
+}
+
 .nomination-form input:focus,
 .nomination-form textarea:focus {
   border-color: rgba(79, 157, 122, 0.72);

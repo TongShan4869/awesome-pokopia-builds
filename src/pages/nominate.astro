@@ -4,10 +4,8 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
-const repoUrl =
-  import.meta.env.PUBLIC_REPO_URL || "https://github.com/TongShan4869/awesome-pokopia-builds";
-const repoPath = repoUrl.replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, "");
-const issueUrl = `https://github.com/${repoPath}/issues/new`;
+const formspreeEndpoint =
+  import.meta.env.PUBLIC_FORMSPREE_ENDPOINT || "https://formspree.io/f/xjgzdogw";
 ---
 
 <BaseLayout
@@ -29,27 +27,12 @@ const issueUrl = `https://github.com/${repoPath}/issues/new`;
     </section>
 
     <section class="nomination-grid" aria-label="Build nomination">
-      <form class="nomination-form" action={issueUrl} method="get">
-        <input type="hidden" name="title" value="Build nomination" data-nomination-title />
-        <input
-          type="hidden"
-          name="labels"
-          value="build nomination,curation"
-        />
-        <textarea name="body" data-nomination-body hidden>
-## Source link
-
-## Build description
-
-## Curator notes
-- Submitted from the website nomination form.
-- Review locally before publishing.
-        </textarea>
-
+      <form class="nomination-form" action={formspreeEndpoint} method="post">
         <label>
           <span>Source link</span>
           <input
             type="url"
+            name="source_url"
             inputmode="url"
             placeholder="https://www.youtube.com/watch?v=..."
             autocomplete="url"
@@ -65,6 +48,7 @@ const issueUrl = `https://github.com/${repoPath}/issues/new`;
         <label>
           <span>Description</span>
           <textarea
+            name="description"
             rows="7"
             maxlength="1200"
             placeholder="What makes this build worth curating? Mention the creator, theme, standout rooms, or useful item details."
@@ -73,14 +57,39 @@ const issueUrl = `https://github.com/${repoPath}/issues/new`;
           ></textarea>
         </label>
 
-        <button class="button primary" type="submit">Open nomination issue</button>
+        <label>
+          <span>Contact <small>(optional)</small></span>
+          <input
+            type="text"
+            name="contact"
+            maxlength="160"
+            placeholder="Email or social handle, if you want a reply"
+            autocomplete="email"
+          />
+        </label>
+
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="nomination-honeypot" />
+
+        <p class="field-help" data-nomination-success hidden>
+          Thanks! Your nomination was saved for curator review.
+        </p>
+        <p class="field-help" data-nomination-error hidden>
+          Submission failed. Please try again in a moment.
+        </p>
+
+        <button class="button primary" type="submit" disabled={!formspreeEndpoint}>Send nomination</button>
+        {!formspreeEndpoint && (
+          <small class="field-help">
+            Nominations are temporarily unavailable while the submission inbox is being configured.
+          </small>
+        )}
       </form>
 
       <aside class="nomination-notes" aria-label="What happens next">
         <p class="eyebrow">Curated, not automatic</p>
         <h2>What happens next</h2>
         <ol>
-          <li>We receive the nomination as a GitHub issue.</li>
+          <li>Your nomination is saved privately for curator review.</li>
           <li>The form rejects non-HTTPS links and unsupported domains.</li>
           <li>Curators batch-review links and screenshots locally.</li>
           <li>Reviewed builds are exported into the public gallery.</li>
@@ -96,9 +105,9 @@ const issueUrl = `https://github.com/${repoPath}/issues/new`;
     const form = document.querySelector(".nomination-form");
     const sourceInput = form?.querySelector("[data-source-url]");
     const sourceHelp = form?.querySelector("[data-source-url-help]");
-    const descriptionInput = form?.querySelector("[data-build-description]");
-    const titleInput = form?.querySelector("[data-nomination-title]");
-    const bodyInput = form?.querySelector("[data-nomination-body]");
+    const successMessage = form?.querySelector("[data-nomination-success]");
+    const errorMessage = form?.querySelector("[data-nomination-error]");
+    const submitButton = form?.querySelector('button[type="submit"]');
     const allowedHosts = new Set([
       "instagram.com",
       "m.instagram.com",
@@ -161,47 +170,57 @@ const issueUrl = `https://github.com/${repoPath}/issues/new`;
       }
     };
 
-    const updateIssueFields = () => {
+    const updateLinkStatus = () => {
       if (
         !(sourceInput instanceof HTMLInputElement) ||
-        !(sourceHelp instanceof HTMLElement) ||
-        !(descriptionInput instanceof HTMLTextAreaElement) ||
-        !(titleInput instanceof HTMLInputElement) ||
-        !(bodyInput instanceof HTMLTextAreaElement)
+        !(sourceHelp instanceof HTMLElement)
       ) {
         return;
       }
 
       const sourceUrl = sourceInput.value.trim();
-      const description = descriptionInput.value.trim();
       const linkStatus = getLinkStatus(sourceUrl);
 
       sourceInput.setCustomValidity(linkStatus.ok ? "" : linkStatus.message);
       sourceInput.dataset.securityStatus = linkStatus.ok ? "safe" : "blocked";
       sourceHelp.textContent = linkStatus.message;
       sourceHelp.dataset.securityStatus = linkStatus.ok ? "safe" : "blocked";
-
-      titleInput.value = sourceUrl ? `Build nomination: ${sourceUrl}` : "Build nomination";
-      bodyInput.value = `## Source link
-\`\`\`
-${sourceUrl || "Paste the original social/video link here."}
-\`\`\`
-
-## Source domain
-${linkStatus.host || "_Waiting for source link._"}
-
-## Build description
-${description || "_Describe why this build should be curated._"}
-
-## Curator notes
-- Submitted from the website nomination form.
-- The website checked for HTTPS and an allowed source domain before submission.
-- Review locally before publishing.`;
     };
 
-    sourceInput?.addEventListener("input", updateIssueFields);
-    descriptionInput?.addEventListener("input", updateIssueFields);
-    form?.addEventListener("submit", updateIssueFields);
-    updateIssueFields();
+    sourceInput?.addEventListener("input", updateLinkStatus);
+    form?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      updateLinkStatus();
+
+      if (
+        !(form instanceof HTMLFormElement) ||
+        !(submitButton instanceof HTMLButtonElement) ||
+        !form.reportValidity()
+      ) {
+        return;
+      }
+
+      successMessage?.setAttribute("hidden", "");
+      errorMessage?.setAttribute("hidden", "");
+      submitButton.disabled = true;
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: new FormData(form),
+          headers: { Accept: "application/json" },
+        });
+
+        if (!response.ok) throw new Error("Submission failed");
+        form.reset();
+        updateLinkStatus();
+        successMessage?.removeAttribute("hidden");
+      } catch {
+        errorMessage?.removeAttribute("hidden");
+      } finally {
+        submitButton.disabled = false;
+      }
+    });
+    updateLinkStatus();
   </script>
 </BaseLayout>
