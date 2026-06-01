@@ -3,9 +3,15 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import catalog from "../../data/pokopia-item-catalog.json";
 
-const builds = (await getCollection("builds")).sort((a, b) =>
-  a.data.title.localeCompare(b.data.title),
-);
+const builds = (await getCollection("builds")).sort((a, b) => {
+  const capturedAt = (value?: string) => {
+    const timestamp = Date.parse(value ?? "");
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+  };
+  const capturedAtDifference = capturedAt(b.data.capturedAt) - capturedAt(a.data.capturedAt);
+
+  return capturedAtDifference || a.data.title.localeCompare(b.data.title);
+});
 const allTags = [...new Set(builds.flatMap((build) => build.data.tags))].sort();
 const itemCatalogCount = catalog.items.filter((item) => item.imageAvailable && item.image).length;
 const basePath = import.meta.env.BASE_URL.endsWith("/")

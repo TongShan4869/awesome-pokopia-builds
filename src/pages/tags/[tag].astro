@@ -6,6 +6,10 @@ import { tagSlug } from "../../utils/tags";
 export async function getStaticPaths() {
   const builds = await getCollection("builds");
   const tags = [...new Set(builds.flatMap((build) => build.data.tags))].sort();
+  const capturedAt = (value?: string) => {
+    const timestamp = Date.parse(value ?? "");
+    return Number.isNaN(timestamp) ? 0 : timestamp;
+  };
 
   return tags.map((tag) => ({
     params: { tag: tagSlug(tag) },
@@ -13,7 +17,11 @@ export async function getStaticPaths() {
       tag,
       builds: builds
         .filter((build) => build.data.tags.includes(tag))
-        .sort((a, b) => a.data.title.localeCompare(b.data.title)),
+        .sort(
+          (a, b) =>
+            capturedAt(b.data.capturedAt) - capturedAt(a.data.capturedAt) ||
+            a.data.title.localeCompare(b.data.title),
+        ),
     },
   }));
 }
