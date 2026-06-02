@@ -6,7 +6,7 @@ A community gallery of inspiring Pokémon Pokopia builds discovered on social me
 [Browse the item catalog](https://tongshan4869.github.io/awesome-pokopia-builds/items/) ·
 [Nominate a build](https://tongshan4869.github.io/awesome-pokopia-builds/nominate/)
 
-![A pastel Pokémon Pokopia landscape with gardens, trees, and Pokémon](public/images/hero/pokopia-pastel-landscape.png)
+![Awesome Pokopia Builds homepage hero section](public/images/readme/hero-section.png)
 
 ## Explore the gallery
 
