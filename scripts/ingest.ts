@@ -215,20 +215,6 @@ const inferredItems: ItemGuess[] = itemDb
     note: "Matched by title/page text. Review visually before exporting.",
   }));
 
-const itemsExcerpt = JSON.stringify(itemDb.slice(0, 40), null, 2);
-const aiReviewPrompt = `Review the captured frames in curation/${slug}/frames for a Pokemon Pokopia build.
-
-Use data/pokopia-item-catalog.json as the item vocabulary when present, falling back to data/items.json. Suggest likely exact item names, tags, and a short public summary.
-Keep confidence and rejected guesses in this private curation JSON only. Do not publish confidence scores to the website.
-Pick selectedFrame only after visually confirming it shows the complete finished build, not the creator face, a blank intro card, UI chrome, or an active construction step.
-The script auto-picked selectedFrame from frameAnalyses; treat that as a ranked suggestion, not a final visual review.
-Prefer frames that show the full finished build and its surrounding zones, usually showcase/title-card/recap moments near the first few seconds or near the end of a video. A full-build frame with subtitles is better than a clean close-up crop.
-For compilation videos, use sourceTimeSeconds to identify separate builds and pick the strongest full-building frame for each useful entry.
-Also look for explicit item/material list frames such as "recommended items", "materials", or "what I used". Keep those as item-evidence frames even when they are not suitable hero screenshots.
-
-First item database entries:
-${itemsExcerpt}`;
-
 const draft: CurationDraft = {
   slug,
   title: cleanTitle(sourceTitle || pageTitle, platform) || "Untitled Pokopia build",
@@ -247,7 +233,6 @@ const draft: CurationDraft = {
   publicNotes: captureNote
     ? `## Curator notes\n\n${captureNote}\n\nReplace this with public-facing build notes after review.`
       : "## Curator notes\n\nAdd the visual details that make this build worth saving.",
-  aiReviewPrompt,
   automationNotes: buildAutomationNotes(frameAnalyses, sourceAuthor, captureNote),
   frameAnalyses,
   reviewChecklist: {

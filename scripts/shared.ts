@@ -47,7 +47,6 @@ export interface CurationDraft {
   tags: string[];
   summary: string;
   publicNotes: string;
-  aiReviewPrompt: string;
   automationNotes?: string[];
   frameAnalyses?: FrameAnalysis[];
   reviewChecklist?: ReviewChecklist;

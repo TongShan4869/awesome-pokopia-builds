@@ -14,7 +14,6 @@
   ],
   "summary": "A Pokopia build saved from a social video. Review this summary before exporting.",
   "publicNotes": "## Curator notes\n\nAdd the visual details that make this build worth saving.",
-  "aiReviewPrompt": "Review the captured frame at curation/instagram-fallback-test/frames/candidate-1.png for a Pokemon Pokopia build.\n\nUse data/pokopia-item-catalog.json as the item vocabulary when present. Suggest likely exact item names, tags, and a short public summary. Keep confidence and rejected guesses in this private curation JSON only. Do not publish confidence scores to the website.",
   "inferredItems": [],
   "rejectedItems": [],
   "reviewState": "draft"
