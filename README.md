@@ -1,22 +1,56 @@
-# awesome-pokopia-builds
+# Awesome Pokopia Builds
 
-A cute, public gallery of inspiring Pokemon Pokopia builds from social videos.
+A community gallery of inspiring Pokémon Pokopia builds discovered on social media.
 
-This repo stores source links, screenshots, public summaries, curated item notes, and the AI-assisted ingestion drafts in `curation/`. It does **not** store copied full videos. Raw confidence scores and review notes are kept in the repository for curator history, but only reviewed MDX content and public images are used by the website.
+[Visit the gallery](https://tongshan4869.github.io/awesome-pokopia-builds/) ·
+[Browse the item catalog](https://tongshan4869.github.io/awesome-pokopia-builds/items/) ·
+[Nominate a build](https://tongshan4869.github.io/awesome-pokopia-builds/nominate/)
 
-## What lives here
+![A pastel Pokémon Pokopia landscape with gardens, trees, and Pokémon](public/images/hero/pokopia-pastel-landscape.png)
 
-- `src/content/builds/*.mdx` - public build summaries shown on the website
+## Explore the gallery
+
+Save ideas for your own island, study the details behind creative builds, and find the items that
+bring each design together.
+
+- Browse curated builds with screenshots, themes, creator credit, and links to the original posts.
+- Search builds by keyword or filter them by theme.
+- Use the visual item catalog to match furniture, plants, structures, and decorations by name.
+- [Send us a build you love](https://tongshan4869.github.io/awesome-pokopia-builds/nominate/)
+  from YouTube, TikTok, Instagram, or Reddit.
+
+## Attribution and corrections
+
+Every featured build links back to its original creator and source. Screenshots are used as credited
+references for fan curation. If you created a featured build and want credit changed, an image
+removed, or a page taken down, [open an issue](https://github.com/TongShan4869/awesome-pokopia-builds/issues)
+with the source URL and requested change.
+
+Item notes are curator-reviewed and may be imperfect. Corrections are always welcome.
+
+## For curators and contributors
+
+This repository stores the public Astro website and the local curation workflow used to review
+build nominations. It does **not** store copied full videos.
+
+<details>
+<summary><strong>Repository map</strong></summary>
+
+- `src/content/builds/*.mdx` - reviewed build summaries shown on the website
 - `public/images/builds/*/hero.png` - curated full-build screenshots
-- `data/pokopia-item-catalog.json` - local item catalog for exact item-name inference
+- `data/pokopia-item-catalog.json` - local catalog for exact item-name inference
 - `data/items.json` - small fallback item database maintained by the curator
 - `public/images/items/*.png` - local item figure copies used by build pages
-- `curation/*.json` and `curation/*/frames/*` - tracked ingestion drafts, frame candidates, review notes, and AI confidence data
+- `curation/*.json` and `curation/*/frames/*` - ingestion drafts, frame candidates, review notes,
+  and AI confidence data
 - `scripts/ingest.ts` - local-only browser capture workflow for social links
 - `scripts/export-build.ts` - converts reviewed curation data into public MDX
 - `scripts/sync-item-catalog.ts` - refreshes the local item catalog and item figures
 
-## Local workflow
+</details>
+
+<details>
+<summary><strong>Local curation workflow</strong></summary>
 
 Install dependencies:
 
@@ -37,12 +71,79 @@ Capture frames from a source link:
 corepack pnpm ingest "https://www.youtube.com/watch?v=V2PGF9Rfc8Q"
 ```
 
-Website visitors can nominate builds through `/nominate/`. The form stores the source link,
-description, and optional contact detail in Formspree, but publishing remains curator-controlled:
-batch-review the nomination links locally, run the ingest workflow, then export only reviewed
-builds.
+The ingest command scans the video for likely showcase moments, captures timestamped candidate
+frames, scores them with local visual heuristics, auto-selects the strongest screenshot candidate,
+and fills any source metadata it can find. Review the generated file in `curation/{slug}.json` and
+open the selected image plus any close runners-up in `curation/{slug}/frames/`.
 
-The nomination page defaults to the project's Formspree endpoint:
+If YouTube headless capture returns blank or player-shell frames, capture a specific timestamp
+through the Playwright browser fallback:
+
+```bash
+corepack pnpm capture-browser-frame "{slug}" --open-source --time=0 --name=opening-showcase.png
+```
+
+For faster review, timestamp-hop and capture after a short settle:
+
+```bash
+corepack pnpm capture-browser-frame "{slug}" --open-source --time=0 --name=opening-showcase.png --settle-ms=1400
+corepack pnpm capture-browser-frame "{slug}" --open-source --time=416 --name=final-tour.png --settle-ms=1400 --headed
+```
+
+`capture-chrome-frame` remains as an alias for older notes. The old visible-screen crop is still
+available with `--desktop --rect=x,y,width,height`, but prefer the Playwright path unless browser
+capture cannot render the video.
+
+If you already have the right screenshot, import it directly:
+
+```bash
+corepack pnpm import-screenshot "{slug}" "/absolute/path/to/screenshot.png"
+```
+
+Then export and build the site:
+
+```bash
+corepack pnpm export-build "{slug}"
+corepack pnpm build
+```
+
+`export-build` refuses to publish drafts. `ingest` refuses to overwrite an existing curation file
+unless you pass `--force`.
+
+</details>
+
+<details>
+<summary><strong>Review checklist</strong></summary>
+
+Before publishing a build:
+
+- Reject creator intros, UI chrome, blank pages, loading shells, and transitions.
+- Choose a `selectedFrame` only when the build itself is clearly visible.
+- Keep explicit recommended-items or materials frames as evidence, even when they are not suitable
+  hero images.
+- Edit inferred items and public notes.
+- Set `reviewState` to `"reviewed"` only after the visual check.
+
+After every draft ingest, prepare a review packet with:
+
+- A link to the selected hero frame and a request to confirm or replace it.
+- Suggested public title, tags, summary, and build notes.
+- A shortlist of high-confidence visible catalog items.
+- A separate verification list for uncertain item matches and automated guesses to reject.
+- Source URL and creator metadata.
+- A prompt to approve or correct the draft.
+
+On approval, update the draft to `reviewState: "reviewed"` and export the build.
+
+</details>
+
+<details>
+<summary><strong>Nomination form and GitHub Pages configuration</strong></summary>
+
+Website visitors can nominate builds through `/nominate/`. The form stores the source link,
+description, and optional contact detail in Formspree. Publishing remains curator-controlled.
+
+The nomination page defaults to:
 
 ```text
 https://formspree.io/f/xjgzdogw
@@ -55,74 +156,8 @@ To switch forms without editing the page, set the GitHub Actions repository vari
 PUBLIC_FORMSPREE_ENDPOINT="https://formspree.io/f/{form-id}" corepack pnpm build
 ```
 
-The ingest command scans the video for likely showcase moments, captures timestamped candidate frames, scores them with local visual heuristics, auto-selects the strongest screenshot candidate, and fills any source metadata it can find. Review the generated file in `curation/{slug}.json` and open the selected image plus any close runners-up in `curation/{slug}/frames/`. These files are tracked so future curation work can see the original candidates and review trail, but they are not part of the rendered Astro site.
+The included GitHub Actions workflow builds the Astro site and publishes it to GitHub Pages.
+Optionally set `PUBLIC_REPO_URL` in the Pages build environment if the homepage repository button
+should point somewhere other than `https://github.com/TongShan4869/awesome-pokopia-builds`.
 
-If YouTube headless capture returns blank/player-shell frames, capture a specific timestamp through the Playwright/Chrome DevTools fallback:
-
-```bash
-corepack pnpm capture-browser-frame "{slug}" --open-source --time=0 --name=opening-showcase.png
-```
-
-By default this launches an isolated Playwright-controlled browser, mutes the video, seeks to `--time`, hides YouTube controls, and screenshots the player through the browser context. It does not capture your desktop or normal Chrome tabs. If headless YouTube renders a blank shell, add `--headed`; this still uses a dedicated browser context and DevTools screenshot, not macOS screen capture. The command updates `selectedFrame`, prepends the screenshot to `frames`, and records the capture method in `frameAnalyses`.
-
-For faster review, timestamp-hop and capture after a short settle:
-
-```bash
-corepack pnpm capture-browser-frame "{slug}" --open-source --time=0 --name=opening-showcase.png --settle-ms=1400
-corepack pnpm capture-browser-frame "{slug}" --open-source --time=416 --name=final-tour.png --settle-ms=1400 --headed
-```
-
-`capture-chrome-frame` remains as an alias for older notes. The old visible-screen crop is still available with `--desktop --rect=x,y,width,height`, but prefer the Playwright path unless the browser capture cannot render the video at all.
-
-The screenshot check is manual and strict:
-
-- Reject creator intro frames, UI chrome, blank pages, loading shells, and transitions.
-- Choose a `selectedFrame` only when the build itself is clearly visible.
-- Keep explicit "recommended items", "materials", or "what I used" frames as item evidence, even when they are not suitable hero images.
-- Edit inferred items and public notes.
-- Set `reviewState` to `"reviewed"` only after that visual check.
-
-After every draft ingest, provide the curator with a review packet instead of only reporting the
-generated file path. The packet should include:
-
-- A link to the selected hero frame and a request to confirm or replace it.
-- Suggested public title, tags, summary, and build notes.
-- A shortlist of high-confidence visible catalog items.
-- A separate "please verify" list for uncertain item matches and any automated guesses to reject.
-- Source URL and creator metadata.
-- A clear prompt to reply with approval or corrections. On approval, update the draft to
-  `reviewState: "reviewed"` and export the build.
-
-If you already have the right screenshot, import it directly:
-
-```bash
-corepack pnpm import-screenshot "{slug}" "/absolute/path/to/screenshot.png"
-```
-
-Then export:
-
-```bash
-corepack pnpm export-build "{slug}"
-```
-
-`export-build` refuses to publish drafts. `ingest` refuses to overwrite an existing curation file unless you pass `--force`.
-
-Build the site:
-
-```bash
-corepack pnpm build
-```
-
-## Attribution and corrections
-
-Every build page links back to the original creator/source. Screenshots are used as credited references for fan curation. If you created a featured build and want credit changed, an image removed, or a page taken down, open an issue or PR with the source URL and requested change.
-
-Item inference is curator-reviewed and may be imperfect. Corrections are welcome.
-
-## GitHub Pages
-
-The included GitHub Actions workflow builds the Astro site and publishes it to GitHub Pages:
-
-https://tongshan4869.github.io/awesome-pokopia-builds/
-
-Optional: set `PUBLIC_REPO_URL` in your Pages build environment if you want the homepage repo button to point somewhere other than `https://github.com/TongShan4869/awesome-pokopia-builds`.
+</details>
