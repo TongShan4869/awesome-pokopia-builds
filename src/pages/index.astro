@@ -26,7 +26,10 @@ const repoUrl =
   <main class="site-shell">
     <nav class="site-nav" aria-label="Main navigation">
       <div class="site-nav-inner">
-        <a class="site-nav-brand" href={basePath}>Awesome Pokopia Builds</a>
+        <a class="site-nav-brand" href={basePath}>
+          <span>Pokopia</span>
+          <strong>Builds</strong>
+        </a>
         <div class="site-nav-links">
           <a href="#gallery">Builds</a>
           <a href={`${basePath}items/`}>Items</a>
@@ -38,11 +41,19 @@ const repoUrl =
 
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow">Pokopia build scrapbook</p>
-        <h1>Awesome Pokopia Builds</h1>
+        <p class="eyebrow">Community build gallery</p>
+        <h1>
+          Awesome<br />
+          <span class="hero-title-tail">
+            <em class="logo-word" aria-label="Pokopia">
+              <span aria-hidden="true">P</span><span aria-hidden="true">o</span><span aria-hidden="true">k</span><span aria-hidden="true">o</span><span aria-hidden="true">p</span><span aria-hidden="true">i</span><span aria-hidden="true">a</span>
+            </em>
+            Builds
+          </span>
+        </h1>
         <p class="hero-text">
-          A gallery of awesome Pokemon Pokopia's builds discovered in social media, with item notes
-          for later remixing.
+          A gallery of awesome Pokémon Pokopia builds discovered on social media.<br />
+          Save inspiring builds, study the details, and find the items behind each idea.
         </p>
         <div class="hero-actions">
           <a class="button primary" href="#gallery">Browse builds</a>
@@ -75,8 +86,20 @@ const repoUrl =
       </div>
     </section>
 
-    <div class="catalog-preview-grid">
-      <section class="catalog-preview" aria-label="Item catalog preview">
+    <div class="explore-grid">
+      <section class="catalog-preview catalog-preview-featured catalog-preview-community" aria-label="Build nominations">
+        <div>
+          <p class="eyebrow">Know a great build?</p>
+          <h2>Send a link for the curator batch</h2>
+          <p>
+            Found a build you love? Send over the source link and a short note, and we'll take it
+            from there. Let's build together!
+          </p>
+        </div>
+        <a class="text-link" href={`${basePath}nominate/`}>Nominate build <span aria-hidden="true">→</span></a>
+      </section>
+
+      <section class="catalog-preview catalog-preview-catalog" aria-label="Item catalog preview">
         <div>
           <p class="eyebrow">Item reference</p>
           <h2>Items list for visual inventory notes</h2>
@@ -85,19 +108,12 @@ const repoUrl =
             for later reference.
           </p>
         </div>
-        <a class="button primary" href={`${basePath}items/`}>Open catalog</a>
-      </section>
-
-      <section class="catalog-preview" aria-label="Build nominations">
-        <div>
-          <p class="eyebrow">Know a great build?</p>
-          <h2>Send a link for the curator batch</h2>
-          <p>
-            Found a build you love? Send over the source link and a short note, and we'll take it
-            from there.
-          </p>
+        <div class="catalog-preview-items" aria-hidden="true">
+          <img src={assetPath("images/items/luxurychair.png")} alt="" loading="lazy" />
+          <img src={assetPath("images/items/skylight.png")} alt="" loading="lazy" />
+          <img src={assetPath("images/items/damphedge.png")} alt="" loading="lazy" />
         </div>
-        <a class="button primary" href={`${basePath}nominate/`}>Nominate build</a>
+        <a class="text-link" href={`${basePath}items/`}>Open catalog <span aria-hidden="true">→</span></a>
       </section>
     </div>
 
