@@ -4,15 +4,23 @@ import "../styles/global.css";
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
+  type?: "website" | "article";
 }
 
 const {
   title = "awesome-pokopia-builds",
   description = "A cute gallery of inspiring Pokemon Pokopia builds from social videos.",
+  image = "/images/hero/pokopia-pastel-landscape.png",
+  type = "website",
 } = Astro.props;
 const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
+const site = Astro.site ?? new URL("https://tongshan4869.github.io");
+const absoluteUrl = (path: string) => new URL(path, site).toString();
+const canonicalUrl = absoluteUrl(Astro.url.pathname);
+const previewImageUrl = absoluteUrl(`${basePath}${image.replace(/^\//, "")}`);
 ---
 
 <!doctype html>
@@ -21,7 +29,21 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="canonical" href={canonicalUrl} />
     <link rel="icon" href={`${basePath}favicon.svg`} />
+    <meta property="og:site_name" content="awesome-pokopia-builds" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={previewImageUrl} />
+    <meta property="og:image:width" content="1536" />
+    <meta property="og:image:height" content="1024" />
+    <meta property="og:image:alt" content={description} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={previewImageUrl} />
     <title>{title}</title>
   </head>
   <body>

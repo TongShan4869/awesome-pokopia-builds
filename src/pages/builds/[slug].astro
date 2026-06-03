@@ -50,7 +50,12 @@ const galleryImages =
 const firstGalleryImage = galleryImages[0];
 ---
 
-<BaseLayout title={`${build.data.title} · awesome-pokopia-builds`} description={build.data.summary}>
+<BaseLayout
+  title={`${build.data.title} · awesome-pokopia-builds`}
+  description={build.data.summary}
+  image={build.data.heroImage}
+  type="article"
+>
   <main class="detail-shell">
     <a class="back-link" href={basePath} aria-label="Back to gallery">
       <span aria-hidden="true">←</span>
