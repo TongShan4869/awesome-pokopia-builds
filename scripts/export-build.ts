@@ -58,10 +58,6 @@ capturedAt: ${JSON.stringify(draft.capturedAt)}
 ---
 
 ${draft.publicNotes.trim()}
-
-## Source
-
-Original source: [${draft.sourceUrl}](${draft.sourceUrl})
 `;
 
 const buildPath = path.join(root, "src", "content", "builds", `${draft.slug}.mdx`);
