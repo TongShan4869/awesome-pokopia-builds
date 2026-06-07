@@ -1,0 +1,168 @@
+{
+  "slug": "www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town",
+  "title": "A little medieval town ✨",
+  "sourceUrl": "https://www.reddit.com/r/Pokopia/comments/1tzgs86/a_little_medieval_town/",
+  "sourceTitle": "A little medieval town ✨",
+  "sourceAuthor": "Lowshii",
+  "sourceAuthorUrl": "https://www.reddit.com/user/Lowshii/",
+  "platform": "other",
+  "creator": "u/Lowshii",
+  "capturedAt": "2026-06-07T18:41:08.044Z",
+  "selectedFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+  "frames": [
+    "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+    "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/candidate-1.png"
+  ],
+  "tags": [
+    "medieval town",
+    "canal",
+    "plaza",
+    "castle"
+  ],
+  "summary": "A finished medieval Pokopia town with half-timbered houses, terraced plazas, canals, a mini-castle, a church tower, market details, and roman ruins.",
+  "publicNotes": "## Build notes\n\nThis town works because it commits fully to a medieval village silhouette: steep tiled roofs, half-timbered walls, narrow stair runs, and a tower rising behind the main houses. The layered rooftops make the whole scene feel dense without becoming visually muddy.\n\nThe plaza details give it a lived-in rhythm. Tiny canals cut through the lower terraces, planters and benches soften the stone, and the roman-ruin corner breaks up the streetscape with a little landmark moment. It is a strong reference for turning a compact build into a whole town square.",
+  "automationNotes": [
+    "Top ranked frame is curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/candidate-1.png at 0:00 with score 0 (small capture, mostly dark, near-blank image).",
+    "1 candidate frame(s) were rejected by automatic validity checks.",
+    "Reddit page, old Reddit, api.reddit.com, and JSON endpoints were blocked by network security.",
+    "Reddit oEmbed returned title and author metadata, but no media URL.",
+    "In-app Browser successfully loaded the Reddit post and exposed original image CDN URLs.",
+    "Selected manual frame was downloaded from https://i.redd.it/qi48jb7w0w5h1.jpg and converted to PNG."
+  ],
+  "frameAnalyses": [
+    {
+      "frame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "sourceTimeSeconds": 0,
+      "width": 1920,
+      "height": 1080,
+      "fileSizeBytes": 2460101,
+      "score": 98,
+      "reasons": [
+        "manual browser media capture",
+        "full-build overview"
+      ],
+      "rejected": false
+    },
+    {
+      "frame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/candidate-1.png",
+      "sourceTimeSeconds": 0,
+      "width": 0,
+      "height": 0,
+      "fileSizeBytes": 77154,
+      "score": 0,
+      "reasons": [
+        "small capture",
+        "mostly dark",
+        "near-blank image"
+      ],
+      "rejected": true
+    }
+  ],
+  "reviewChecklist": {
+    "selectedFrameAutoPicked": false,
+    "selectedFrameNeedsHumanCheck": false,
+    "sourceMetadataNeedsHumanCheck": false,
+    "itemsNeedVisualReview": false,
+    "notesNeedRewrite": false
+  },
+  "inferredItems": [
+    {
+      "name": "Tiled hipped roof",
+      "confidence": 0.9,
+      "image": "/images/items/tiledhippedroof.png",
+      "evidence": "Repeated reddish-brown roof caps define the medieval house silhouettes.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    },
+    {
+      "name": "Brick hipped roof",
+      "confidence": 0.78,
+      "image": "/images/items/brickhippedroof.png",
+      "evidence": "Orange and red roof sections appear across the left and lower foreground buildings.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    },
+    {
+      "name": "Plaster wall",
+      "confidence": 0.84,
+      "image": "/images/items/plasterwall.png",
+      "evidence": "Cream wall panels fill the half-timbered house faces.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    },
+    {
+      "name": "Glass window",
+      "confidence": 0.74,
+      "image": "/images/items/glasswindow.png",
+      "evidence": "Small framed windows repeat on the houses and tower-facing walls.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Stone steps",
+      "confidence": 0.92,
+      "image": "/images/items/stonesteps.png",
+      "evidence": "Wide stone stair runs connect the lower canal terrace to the central plaza.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Stone tiling",
+      "confidence": 0.86,
+      "image": "/images/items/stonetiling.png",
+      "evidence": "Gray stone paving covers the plaza and terraced streets.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Stone fencing",
+      "confidence": 0.82,
+      "image": "/images/items/stonefencing.png",
+      "evidence": "Short dark fence segments line the canals, stairs, and plaza edges.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    },
+    {
+      "name": "Planter",
+      "confidence": 0.88,
+      "image": "/images/items/planter.png",
+      "evidence": "Raised flower planters and balcony boxes add color along the canal and houses.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Garden light",
+      "confidence": 0.72,
+      "image": "/images/items/gardenlight.png",
+      "evidence": "Small glowing lamps are placed near canal paths and plaza steps.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    },
+    {
+      "name": "Wooden bench",
+      "confidence": 0.8,
+      "image": "/images/items/woodenbench.png",
+      "evidence": "Benches sit around the open plaza and ruin area.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Glossy awning",
+      "confidence": 0.64,
+      "image": "/images/items/glossyawning.png",
+      "evidence": "Striped awnings shade the right-side market storefronts.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    },
+    {
+      "name": "Water basin",
+      "confidence": 0.58,
+      "image": "/images/items/waterbasin.png",
+      "evidence": "A small water feature anchors the roman-ruin corner of the plaza.",
+      "evidenceFrame": "curation/www-reddit-com-r-pokopia-comments-1tzgs86-a-little-medieval-town/frames/selected-manual.png",
+      "note": "Approximate visual match inferred from the selected key frame."
+    }
+  ],
+  "rejectedItems": [],
+  "reviewState": "reviewed"
+}
