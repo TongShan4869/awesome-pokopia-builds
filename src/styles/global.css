@@ -1320,7 +1320,7 @@ body.is-share-open {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 0.8rem;
-  padding: 1rem 0 4rem;
+  padding: 1rem 0 2rem;
 }
 
 .catalog-item-card {
@@ -1380,6 +1380,20 @@ body.is-share-open {
 .catalog-mini-tags span {
   padding: 0.22rem 0.42rem;
   font-size: 0.7rem;
+}
+
+.catalog-source-note {
+  width: 100%;
+  margin: 0 0 4rem;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.catalog-source-note a {
+  color: var(--mint-dark);
+  font-weight: 950;
 }
 
 @media (max-width: 860px) {
