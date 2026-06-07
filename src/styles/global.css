@@ -521,6 +521,19 @@ body.is-share-open {
   object-position: 54% center;
 }
 
+.hero-image-credit {
+  position: absolute;
+  right: clamp(0.75rem, 2vw, 1.25rem);
+  bottom: clamp(0.65rem, 1.5vw, 1rem);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  padding: 0.42rem 0.58rem;
+}
+
 
 .toolbar {
   display: grid;
