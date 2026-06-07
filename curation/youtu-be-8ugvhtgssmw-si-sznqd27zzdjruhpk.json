@@ -1,0 +1,118 @@
+{
+  "slug": "youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk",
+  "title": "Submerged Railway [Pokopia Build]",
+  "sourceUrl": "https://youtu.be/8ugVHtGssmw?si=SznqD27zzDJrUhpk",
+  "sourceTitle": "Submerged Railway [Pokopia Build]",
+  "sourceAuthor": "귀월 Gwiwol",
+  "sourceAuthorUrl": "https://www.youtube.com/@%EA%B7%80%EC%9B%94",
+  "platform": "youtube",
+  "creator": "귀월 Gwiwol",
+  "capturedAt": "2026-06-07T03:21:38.001Z",
+  "selectedFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+  "frames": [
+    "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png"
+  ],
+  "tags": [
+    "railway",
+    "submerged",
+    "waterfront",
+    "sunset"
+  ],
+  "summary": "A dreamy flooded rail station where a train glides across submerged tracks toward a tiny platform, framed by utility poles, lantern light, and soft waterfront planting.",
+  "publicNotes": "## Build notes\n\nThis frame sells the build immediately: the train is centered at the end of a waterlogged rail line, with the track disappearing under a turquoise surface instead of sitting on dry ground. The utility poles and overhead wire make the route feel functional, while the warm sunset haze turns the flooded scene into something gentle rather than abandoned.\n\nThe platform details do a lot of quiet work. A bicycle, mailbox, glowing lamp, pale paving, and flowered hedges make the stop feel like a place someone uses every day. The best reference idea here is the contrast between heavy transit infrastructure and soft shoreline decoration.",
+  "automationNotes": [
+    "Capture produced warnings; review publicNotes before publishing."
+  ],
+  "frameAnalyses": [],
+  "reviewChecklist": {
+    "selectedFrameAutoPicked": false,
+    "selectedFrameNeedsHumanCheck": false,
+    "sourceMetadataNeedsHumanCheck": false,
+    "itemsNeedVisualReview": false,
+    "notesNeedRewrite": false
+  },
+  "inferredItems": [
+    {
+      "name": "Railway track",
+      "confidence": 0.94,
+      "image": "/images/items/railwaytrack.png",
+      "evidence": "Parallel rails run from the platform into the water and toward the approaching train.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Utility pole",
+      "confidence": 0.88,
+      "image": "/images/items/utilitypole.png",
+      "evidence": "Tall poles line both sides of the rail approach and support the overhead wire.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Wire",
+      "confidence": 0.86,
+      "image": "/images/items/wire.png",
+      "evidence": "Thin overhead lines stretch between the poles above the train.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Bike",
+      "confidence": 0.92,
+      "image": "/images/items/bike.png",
+      "evidence": "A bicycle is parked on the small platform beside the water.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Harbor pole",
+      "confidence": 0.74,
+      "image": "/images/items/harborpole.png",
+      "evidence": "Slim waterfront posts punctuate the submerged rail line and station edge.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Resort light",
+      "confidence": 0.72,
+      "image": "/images/items/resortlight.png",
+      "evidence": "A round glowing lantern sits on the right-side platform roof.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    },
+    {
+      "name": "Square tiling",
+      "confidence": 0.82,
+      "image": "/images/items/squaretiling.png",
+      "evidence": "Pale square paving blocks form the station platform.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Grate flooring",
+      "confidence": 0.78,
+      "image": "/images/items/grateflooring.png",
+      "evidence": "Metal grate panels border the platform near the submerged track.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Exact item-name match inferred from the selected key frame."
+    },
+    {
+      "name": "Adorable hedge",
+      "confidence": 0.76,
+      "image": "/images/items/adorablehedge.png",
+      "evidence": "Rounded hedges with pale blossoms soften the station edge in the foreground.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    },
+    {
+      "name": "Seashore grass",
+      "confidence": 0.68,
+      "image": "/images/items/seashoregrass.png",
+      "evidence": "Bright low shoreline planting fills the foreground near the flooded platform.",
+      "evidenceFrame": "curation/youtu-be-8ugvhtgssmw-si-sznqd27zzdjruhpk/frames/selected-manual.png",
+      "note": "Visual match inferred from the selected key frame."
+    }
+  ],
+  "rejectedItems": [],
+  "reviewState": "reviewed"
+}
