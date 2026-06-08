@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { formatPlatform } from "../../utils/platforms";
 import { tagSlug } from "../../utils/tags";
 
 export async function getStaticPaths() {
@@ -54,7 +55,7 @@ const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
         <a class="build-card" href={`${basePath}builds/${build.slug}/`}>
           <img src={assetPath(build.data.heroImage)} alt={`${build.data.title} full build screenshot`} loading="lazy" />
           <div class="build-card-copy">
-            <p>{build.data.platform} · {build.data.creator}</p>
+            <p>{formatPlatform(build.data.platform)} · {build.data.creator}</p>
             <h2>{build.data.title}</h2>
             <span>{build.data.summary}</span>
           </div>

@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import catalog from "../../../data/pokopia-item-catalog.json";
+import { formatPlatform } from "../../utils/platforms";
 import { tagSlug } from "../../utils/tags";
 
 export async function getStaticPaths() {
@@ -68,7 +69,7 @@ const firstGalleryImage = galleryImages[0];
         <header class="detail-header">
           <div class="detail-copy">
             <div class="detail-meta-row">
-              <p class="eyebrow">{build.data.platform} · {build.data.creator}</p>
+              <p class="eyebrow">{formatPlatform(build.data.platform)} · {build.data.creator}</p>
             </div>
             <h1>
               <a class="detail-title-link" href={build.data.sourceUrl} target="_blank" rel="noreferrer">
@@ -117,7 +118,7 @@ const firstGalleryImage = galleryImages[0];
                 <dd>{build.data.sourceTitle ?? build.data.title}</dd>
               </div>
               <div>
-                <dt>Video posted by</dt>
+                <dt>Posted by</dt>
                 <dd>
                   {build.data.sourceAuthorUrl ? (
                     <a href={build.data.sourceAuthorUrl} target="_blank" rel="noreferrer">
@@ -176,7 +177,7 @@ const firstGalleryImage = galleryImages[0];
             </div>
             <div>
               <dt>Platform</dt>
-              <dd>{build.data.platform}</dd>
+              <dd>{formatPlatform(build.data.platform)}</dd>
             </div>
           </dl>
 

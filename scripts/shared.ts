@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-export type Platform = "youtube" | "tiktok" | "instagram" | "other";
+export type Platform = "youtube" | "tiktok" | "instagram" | "reddit" | "other";
 
 export interface ItemGuess {
   name: string;
@@ -60,6 +60,7 @@ export function detectPlatform(rawUrl: string): Platform {
   if (host.includes("youtube.com") || host.includes("youtu.be")) return "youtube";
   if (host.includes("tiktok.com")) return "tiktok";
   if (host.includes("instagram.com")) return "instagram";
+  if (host.includes("reddit.com")) return "reddit";
   return "other";
 }
 

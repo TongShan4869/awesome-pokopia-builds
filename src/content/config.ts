@@ -9,7 +9,7 @@ const builds = defineCollection({
     sourceAuthor: z.string().optional(),
     sourceAuthorUrl: z.string().url().optional(),
     sourcePublishedAt: z.string().optional(),
-    platform: z.enum(["youtube", "tiktok", "instagram", "other"]),
+    platform: z.enum(["youtube", "tiktok", "instagram", "reddit", "other"]),
     creator: z.string().default("Unknown creator"),
     heroImage: z.string(),
     galleryImages: z

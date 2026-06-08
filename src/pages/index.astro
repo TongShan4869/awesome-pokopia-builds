@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import catalog from "../../data/pokopia-item-catalog.json";
+import { formatPlatform } from "../utils/platforms";
 
 const builds = (await getCollection("builds")).sort((a, b) => {
   const capturedAt = (value?: string) => {
@@ -192,7 +193,7 @@ const socialShareLinks = [
           >
             <img src={assetPath(build.data.heroImage)} alt={`${build.data.title} full build screenshot`} loading="lazy" />
             <div class="build-card-copy">
-              <p>{build.data.platform} · {build.data.creator}</p>
+              <p>{formatPlatform(build.data.platform)} · {build.data.creator}</p>
               <h2>{build.data.title}</h2>
               <span>{build.data.summary}</span>
             </div>
