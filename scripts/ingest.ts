@@ -1,6 +1,6 @@
 import { existsSync, rmSync, statSync, unlinkSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
 import { chromium, type Page } from "playwright";
 import {
   detectPlatform,
@@ -55,6 +55,7 @@ let sourceDurationSeconds = 0;
 let shouldTryBrowserFallback = true;
 const capturedFrames: string[] = [];
 const frameSourceTimes = new Map<string, number>();
+let galleryFrames: CurationDraft["galleryFrames"] = [];
 
 try {
   const browser = await chromium.launch({ headless: true });
@@ -78,6 +79,23 @@ try {
   sourceAuthorUrl = metadata.sourceAuthorUrl;
   sourcePublishedAt = metadata.sourcePublishedAt;
   sourceDurationSeconds = await getVideoDurationSeconds(page);
+
+  if (process.env.DEBUG_INGEST_IMAGES) {
+    const pageDebug = await page.evaluate(`({
+      url: location.href,
+      title: document.title,
+      imageCount: document.querySelectorAll("img").length,
+      bodyText: document.body?.innerText?.slice(0, 120) ?? ""
+    })`);
+    console.log(`Image extraction page: ${JSON.stringify(pageDebug)}`);
+  }
+
+  const directImageFrames = await captureDirectImageFrames(page, framesDir);
+  if (directImageFrames.length > 0) {
+    capturedFrames.push(...directImageFrames);
+    shouldTryBrowserFallback = false;
+    captureNote += `\nCaptured ${directImageFrames.length} direct image${directImageFrames.length === 1 ? "" : "s"} from the source page.`;
+  }
 
   const youTubeId = platform === "youtube" ? getYouTubeId(url) : null;
   if (youTubeId) {
@@ -177,6 +195,16 @@ try {
     capturedFrames.push(firstRelativeFramePath);
   }
   frameAnalyses = await analyzeFrames(page, capturedFrames, frameSourceTimes, sourceDurationSeconds);
+  const validDirectImageFrames = directImageFrames.filter(
+    (frame) => !frameAnalyses.find((analysis) => analysis.frame === frame)?.rejected,
+  );
+  if (validDirectImageFrames.length > 1) {
+    galleryFrames = validDirectImageFrames.map((frame, index) => ({
+      frame,
+      caption: index === 0 ? "Primary view" : `Gallery view ${index + 1}`,
+    }));
+    captureNote += "\nMultiple source images detected; export will publish them as a build gallery.";
+  }
   await browser.close();
 } catch (error) {
   captureNote =
@@ -185,7 +213,7 @@ try {
       : "Automatic browser capture failed for an unknown reason.";
 }
 
-if (!existsSync(firstFramePath)) {
+if (capturedFrames.length === 0) {
   captureNote +=
     "\nManual fallback: add a screenshot to this path, then rerun export after review.";
 }
@@ -226,8 +254,14 @@ const draft: CurationDraft = {
   platform,
   creator: sourceAuthor || "Unknown creator",
   capturedAt: new Date().toISOString(),
-  selectedFrame: capturedFrames.length > 0 ? pickSelectedFrame(frameAnalyses, capturedFrames[0]) : "",
+  selectedFrame:
+    galleryFrames.length > 1
+      ? (galleryFrames[0]?.frame ?? capturedFrames[0] ?? "")
+      : capturedFrames.length > 0
+        ? pickSelectedFrame(frameAnalyses, capturedFrames[0])
+        : "",
   frames: capturedFrames,
+  galleryFrames,
   tags: ["cozy"],
   summary: "A Pokopia build saved from a social video. Review this summary before exporting.",
   publicNotes: captureNote
@@ -258,6 +292,154 @@ if (draft.automationNotes?.length) {
 }
 if (captureNote) {
   console.log(captureNote);
+}
+
+async function captureDirectImageFrames(page: Page, framesDirPath: string) {
+  type ImageCandidate = { url: string; imageIndex?: number };
+  const imageCandidates = (await page
+    .evaluate(`(() => {
+      const candidates = [];
+      const seen = new Set();
+      const addUrl = (rawValue, imageIndex) => {
+        if (!rawValue) return;
+        const urlCandidates = rawValue
+          .split(",")
+          .map((entry) => entry.trim().split(/\\s+/)[0])
+          .filter(Boolean);
+        for (const candidate of urlCandidates) {
+          try {
+            const url = new URL(candidate, document.baseURI).toString();
+            if (seen.has(url)) continue;
+            seen.add(url);
+            candidates.push({ url, imageIndex });
+          } catch {
+            // Ignore malformed page-provided URLs.
+          }
+        }
+      };
+
+      document
+        .querySelectorAll('meta[property="og:image"], meta[name="twitter:image"], meta[property="og:image:url"]')
+        .forEach((node) => addUrl(node.getAttribute("content")));
+      [...document.querySelectorAll("img")]
+        .forEach((node, imageIndex) => {
+          addUrl(node.currentSrc, imageIndex);
+          addUrl(node.getAttribute("src"), imageIndex);
+          addUrl(node.getAttribute("srcset"), imageIndex);
+        });
+      document
+        .querySelectorAll("source[srcset], a[href]")
+        .forEach((node) => {
+          addUrl(node.getAttribute("srcset"));
+          addUrl(node.getAttribute("href"));
+        });
+
+      return candidates;
+    })()`)
+    .catch((error) => {
+      if (process.env.DEBUG_INGEST_IMAGES) {
+        console.log(`Image extraction failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+      return [];
+    })) as ImageCandidate[];
+
+  const sourceHost = new URL(page.url()).hostname.replace(/^www\./, "");
+  const sourceIsReddit = sourceHost.includes("reddit.com");
+  const directImageCandidates = imageCandidates
+    .map((candidate) => ({ ...candidate, url: normalizeImageUrl(candidate.url) }))
+    .filter((candidate): candidate is { url: string; imageIndex?: number } => Boolean(candidate.url))
+    .filter((candidate) => isLikelySourceImage(candidate.url, sourceIsReddit))
+    .slice(0, 12);
+  if (process.env.DEBUG_INGEST_IMAGES) {
+    console.log(
+      `Image candidates: ${imageCandidates.length}; direct source candidates: ${directImageCandidates.length}`,
+    );
+    for (const candidate of imageCandidates) {
+      console.log(`Candidate image URL: ${candidate.url}`);
+    }
+  }
+
+  const seenImageUrls = new Set<string>();
+  const savedFrames: string[] = [];
+  for (const candidate of directImageCandidates) {
+    if (seenImageUrls.has(candidate.url)) continue;
+    seenImageUrls.add(candidate.url);
+    const outputPathWithoutExtension = path.join(framesDirPath, `source-image-${savedFrames.length + 1}`);
+    const result =
+      (await downloadSourceImage(candidate.url, outputPathWithoutExtension)) ||
+      (await screenshotImageElement(page, candidate.imageIndex, `${outputPathWithoutExtension}.png`));
+    if (process.env.DEBUG_INGEST_IMAGES) {
+      console.log(`${result ? "Saved" : "Skipped"} source image: ${candidate.url}`);
+    }
+    if (!result) continue;
+    savedFrames.push(path.relative(process.cwd(), result));
+  }
+
+  return savedFrames;
+}
+
+async function screenshotImageElement(page: Page, imageIndex: number | undefined, outputPath: string) {
+  if (imageIndex === undefined) return "";
+  const image = page.locator("img").nth(imageIndex);
+  const isLargeSourceImage = await image
+    .evaluate((node) => {
+      const img = node as HTMLImageElement;
+      return img.complete && img.naturalWidth >= 480 && img.naturalHeight >= 270;
+    })
+    .catch(() => false);
+  if (!isLargeSourceImage) return "";
+
+  await image.screenshot({ path: outputPath }).catch(() => undefined);
+  return existsSync(outputPath) ? outputPath : "";
+}
+
+function normalizeImageUrl(rawUrl: string) {
+  try {
+    const parsed = new URL(rawUrl.replace(/&amp;/g, "&"));
+    if (parsed.hostname === "preview.redd.it" || parsed.hostname === "external-preview.redd.it") {
+      parsed.searchParams.delete("width");
+      parsed.searchParams.delete("crop");
+      parsed.searchParams.delete("auto");
+      parsed.searchParams.delete("s");
+      parsed.hostname = "i.redd.it";
+    }
+    return parsed.toString();
+  } catch {
+    return "";
+  }
+}
+
+function isLikelySourceImage(imageUrl: string, sourceIsReddit: boolean) {
+  const parsed = new URL(imageUrl);
+  const imagePath = parsed.pathname.toLowerCase();
+  const hasImageExtension = /\.(avif|jpe?g|png|webp)$/i.test(imagePath);
+  const imageHost = parsed.hostname.replace(/^www\./, "");
+
+  if (sourceIsReddit) {
+    return hasImageExtension && ["i.redd.it", "preview.redd.it", "external-preview.redd.it"].includes(imageHost);
+  }
+
+  return hasImageExtension && !/(avatar|icon|logo|sprite|emoji)/i.test(imagePath);
+}
+
+async function downloadSourceImage(imageUrl: string, outputPathWithoutExtension: string) {
+  const response = await fetch(imageUrl, {
+    headers: {
+      "User-Agent": "awesome-pokopia-builds curator/0.1",
+    },
+  }).catch(() => null);
+  if (!response?.ok) return "";
+
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.startsWith("image/")) return "";
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  if (bytes.byteLength < 25_000) return "";
+
+  const extension =
+    contentType.includes("png") ? ".png" : contentType.includes("webp") ? ".webp" : contentType.includes("avif") ? ".avif" : ".jpg";
+  const outputPath = `${outputPathWithoutExtension}${extension}`;
+  await writeFile(outputPath, bytes);
+  return outputPath;
 }
 
 function cleanTitle(title: string, platformName: Platform): string {
@@ -428,6 +610,7 @@ async function analyzeFrames(
   for (const frame of frames) {
     const absolutePath = path.join(process.cwd(), frame);
     const fileSizeBytes = statSync(absolutePath).size;
+    const imageSource = await imageDataUrl(absolutePath);
     const metrics = await page
       .evaluate(async (src) => {
         const image = new Image();
@@ -505,7 +688,7 @@ async function analyzeFrames(
           skinRatioTop: topPixels > 0 ? topSkinPixels / topPixels : 0,
           horizontalSeamScore,
         };
-      }, pathToFileURL(absolutePath).href)
+      }, imageSource)
       .catch(() => ({
         width: 0,
         height: 0,
@@ -602,6 +785,20 @@ async function analyzeFrames(
   }
 
   return analyses.sort((a, b) => Number(a.rejected) - Number(b.rejected) || b.score - a.score);
+}
+
+async function imageDataUrl(filePath: string) {
+  const extension = path.extname(filePath).toLowerCase();
+  const mimeType =
+    extension === ".jpg" || extension === ".jpeg"
+      ? "image/jpeg"
+      : extension === ".webp"
+        ? "image/webp"
+        : extension === ".avif"
+          ? "image/avif"
+          : "image/png";
+  const bytes = await readFile(filePath);
+  return `data:${mimeType};base64,${bytes.toString("base64")}`;
 }
 
 function pickSelectedFrame(analyses: FrameAnalysis[], fallback: string) {

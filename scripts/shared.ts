@@ -31,6 +31,12 @@ export interface ReviewChecklist {
   notesNeedRewrite: boolean;
 }
 
+export interface GalleryFrame {
+  frame: string;
+  alt?: string;
+  caption?: string;
+}
+
 export interface CurationDraft {
   slug: string;
   title: string;
@@ -44,6 +50,7 @@ export interface CurationDraft {
   capturedAt: string;
   selectedFrame: string;
   frames: string[];
+  galleryFrames?: GalleryFrame[];
   tags: string[];
   summary: string;
   publicNotes: string;

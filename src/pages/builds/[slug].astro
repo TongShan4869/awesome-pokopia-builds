@@ -39,16 +39,17 @@ const basePath = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 const assetPath = (asset: string) => `${basePath}${asset.replace(/^\//, "")}`;
-const galleryImages =
-  build.data.galleryImages.length > 0
-    ? build.data.galleryImages
-    : [
-        {
-          src: build.data.heroImage,
-          alt: `${build.data.title} full build screenshot`,
-        },
-      ];
+const heroGalleryImage = build.data.galleryImages.find((image) => image.src === build.data.heroImage);
+const galleryImages = [
+  {
+    src: build.data.heroImage,
+    alt: heroGalleryImage?.alt ?? `${build.data.title} full build screenshot`,
+    caption: heroGalleryImage?.caption,
+  },
+  ...build.data.galleryImages.filter((image) => image.src !== build.data.heroImage),
+];
 const firstGalleryImage = galleryImages[0];
+const platformLabel = formatPlatform(build.data.platform);
 ---
 
 <BaseLayout
@@ -69,7 +70,7 @@ const firstGalleryImage = galleryImages[0];
         <header class="detail-header">
           <div class="detail-copy">
             <div class="detail-meta-row">
-              <p class="eyebrow">{formatPlatform(build.data.platform)} · {build.data.creator}</p>
+              <p class="eyebrow">{platformLabel} · {build.data.creator}</p>
             </div>
             <h1>
               <a class="detail-title-link" href={build.data.sourceUrl} target="_blank" rel="noreferrer">
@@ -81,29 +82,52 @@ const firstGalleryImage = galleryImages[0];
         </header>
 
         <section class="build-gallery" data-build-gallery>
-          <img
-            class="detail-image"
-            src={assetPath(firstGalleryImage.src)}
-            alt={firstGalleryImage.alt ?? `${build.data.title} build screenshot`}
-            data-gallery-main
-          />
-          {galleryImages.length > 1 && (
-            <div class="gallery-strip" aria-label="Build screenshots">
-              {galleryImages.map((image, index) => (
+          <div
+            class="gallery-stage"
+            tabindex={galleryImages.length > 1 ? "0" : undefined}
+            aria-label={galleryImages.length > 1 ? "Build screenshot gallery" : undefined}
+          >
+            <img
+              class="detail-image"
+              src={assetPath(firstGalleryImage.src)}
+              alt={firstGalleryImage.alt ?? `${build.data.title} build screenshot`}
+              data-gallery-main
+            />
+            {galleryImages.length > 1 && (
+              <>
                 <button
-                  class:list={["gallery-thumb", { "is-active": index === 0 }]}
+                  class="gallery-arrow gallery-arrow-prev"
                   type="button"
-                  aria-label={`Show screenshot ${index + 1}`}
-                  aria-pressed={index === 0 ? "true" : "false"}
-                  data-gallery-src={assetPath(image.src)}
-                  data-gallery-alt={image.alt ?? `${build.data.title} build screenshot ${index + 1}`}
+                  aria-label="Show previous screenshot"
+                  data-gallery-step="-1"
                 >
-                  <img src={assetPath(image.src)} alt="" loading={index === 0 ? "eager" : "lazy"} />
-                  {image.caption && <span>{image.caption}</span>}
+                  <span aria-hidden="true">‹</span>
                 </button>
-              ))}
-            </div>
-          )}
+                <button
+                  class="gallery-arrow gallery-arrow-next"
+                  type="button"
+                  aria-label="Show next screenshot"
+                  data-gallery-step="1"
+                >
+                  <span aria-hidden="true">›</span>
+                </button>
+                <div class="gallery-dots" aria-label="Build screenshots">
+                  {galleryImages.map((image, index) => (
+                    <button
+                      class:list={["gallery-dot", { "is-active": index === 0 }]}
+                      type="button"
+                      aria-label={`Show screenshot ${index + 1}`}
+                      aria-pressed={index === 0 ? "true" : "false"}
+                      data-gallery-src={assetPath(image.src)}
+                      data-gallery-alt={image.alt ?? `${build.data.title} build screenshot ${index + 1}`}
+                      data-gallery-caption={image.caption ?? ""}
+                      data-gallery-index={index}
+                    ></button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </section>
       </section>
 
@@ -177,7 +201,7 @@ const firstGalleryImage = galleryImages[0];
             </div>
             <div>
               <dt>Platform</dt>
-              <dd>{formatPlatform(build.data.platform)}</dd>
+              <dd>{platformLabel}</dd>
             </div>
           </dl>
 
@@ -215,19 +239,41 @@ const firstGalleryImage = galleryImages[0];
   document.querySelectorAll<HTMLElement>("[data-build-gallery]").forEach((gallery) => {
     const mainImage = gallery.querySelector<HTMLImageElement>("[data-gallery-main]");
     const buttons = [...gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-src]")];
+    const arrows = [...gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-step]")];
+    const stage = gallery.querySelector<HTMLElement>(".gallery-stage");
+    let activeIndex = 0;
 
-    buttons.forEach((button) => {
-      button.addEventListener("click", () => {
-        if (!mainImage) return;
+    const showImage = (nextIndex: number) => {
+      if (!mainImage || buttons.length === 0) return;
 
-        mainImage.src = button.dataset.gallerySrc ?? mainImage.src;
-        mainImage.alt = button.dataset.galleryAlt ?? mainImage.alt;
-        buttons.forEach((item) => {
-          const isActive = item === button;
-          item.classList.toggle("is-active", isActive);
-          item.setAttribute("aria-pressed", String(isActive));
-        });
+      activeIndex = (nextIndex + buttons.length) % buttons.length;
+      const activeButton = buttons[activeIndex];
+      mainImage.src = activeButton.dataset.gallerySrc ?? mainImage.src;
+      mainImage.alt = activeButton.dataset.galleryAlt ?? mainImage.alt;
+      buttons.forEach((item, index) => {
+        const isActive = index === activeIndex;
+        item.classList.toggle("is-active", isActive);
+        item.setAttribute("aria-pressed", String(isActive));
       });
+    };
+
+    buttons.forEach((button, index) => {
+      button.addEventListener("click", () => showImage(index));
+    });
+
+    arrows.forEach((arrow) => {
+      arrow.addEventListener("click", () => showImage(activeIndex + Number(arrow.dataset.galleryStep ?? 0)));
+    });
+
+    stage?.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        showImage(activeIndex - 1);
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        showImage(activeIndex + 1);
+      }
     });
   });
 </script>
