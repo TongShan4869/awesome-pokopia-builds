@@ -50,6 +50,39 @@ const galleryImages = [
 ];
 const firstGalleryImage = galleryImages[0];
 const platformLabel = formatPlatform(build.data.platform);
+const site = Astro.site ?? new URL("https://tongshan4869.github.io");
+const shareUrl = new URL(`${basePath}builds/${build.slug}/`, site).toString();
+const shareTitle = `${build.data.title} · awesome-pokopia-builds`;
+const shareText = `${build.data.title}: ${build.data.summary}`;
+const encodedShareUrl = encodeURIComponent(shareUrl);
+const encodedShareTitle = encodeURIComponent(shareTitle);
+const encodedShareText = encodeURIComponent(shareText);
+const socialShareLinks = [
+  {
+    label: "Discord",
+    icon: "D",
+    className: "share-icon-discord",
+    copy: true,
+  },
+  {
+    label: "X",
+    icon: "X",
+    className: "share-icon-x",
+    href: `https://twitter.com/intent/tweet?url=${encodedShareUrl}&text=${encodedShareText}`,
+  },
+  {
+    label: "Reddit",
+    icon: "r",
+    className: "share-icon-reddit",
+    href: `https://www.reddit.com/submit?url=${encodedShareUrl}&title=${encodedShareTitle}`,
+  },
+  {
+    label: "Bluesky",
+    icon: "b",
+    className: "share-icon-bluesky",
+    href: `https://bsky.app/intent/compose?text=${encodedShareText}%20${encodedShareUrl}`,
+  },
+];
 ---
 
 <BaseLayout
@@ -61,6 +94,25 @@ const platformLabel = formatPlatform(build.data.platform);
   type="article"
 >
   <main class="detail-shell">
+    <nav class="site-nav" aria-label="Main navigation">
+      <div class="site-nav-inner">
+        <a class="site-nav-brand" href={basePath}>
+          <span>Pokopia</span>
+          <strong>Builds</strong>
+        </a>
+        <div class="site-nav-links">
+          <a href={`${basePath}#gallery`}>Builds</a>
+          <a href={`${basePath}items/`}>Items</a>
+          <a href={`${basePath}nominate/`}>Nominate</a>
+          <div class="share-menu nav-share-menu" data-share-menu>
+            <button class="site-nav-share" type="button" aria-expanded="false" aria-controls="share-panel" data-share-trigger>
+              Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
     <a class="back-link" href={basePath} aria-label="Back to gallery">
       <span aria-hidden="true">←</span>
       Back to gallery
@@ -233,9 +285,92 @@ const platformLabel = formatPlatform(build.data.platform);
       </section>
     </article>
   </main>
+
+  <div class="share-panel" id="share-panel" data-share-panel hidden>
+    <div class="share-backdrop" data-share-close></div>
+    <section class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-title">
+      <button class="share-close" type="button" aria-label="Close share dialog" data-share-close>
+        <span aria-hidden="true">×</span>
+      </button>
+      <h2 id="share-title">Share this build</h2>
+      <div class="share-links" aria-label="Social share links">
+        {socialShareLinks.map((link) => (
+          link.copy ? (
+            <button type="button" data-share-copy>
+              <span class:list={["share-icon", link.className]} aria-hidden="true">{link.icon}</span>
+              <span>{link.label}</span>
+            </button>
+          ) : (
+            <a href={link.href} target="_blank" rel="noreferrer">
+              <span class:list={["share-icon", link.className]} aria-hidden="true">{link.icon}</span>
+              <span>{link.label}</span>
+            </a>
+          )
+        ))}
+      </div>
+      <label class="share-copy">
+        <span>Share link</span>
+        <input type="url" value={shareUrl} readonly data-share-input />
+      </label>
+      <button class="button primary share-copy-button" type="button" data-share-copy>
+        Copy link
+      </button>
+      <p class="share-status" aria-live="polite" data-share-status></p>
+    </section>
+  </div>
 </BaseLayout>
 
 <script>
+  const shareTrigger = document.querySelector<HTMLButtonElement>("[data-share-trigger]");
+  const sharePanel = document.querySelector<HTMLElement>("[data-share-panel]");
+  const shareInput = document.querySelector<HTMLInputElement>("[data-share-input]");
+  const shareCopyControls = [...document.querySelectorAll<HTMLButtonElement>("[data-share-copy]")];
+  const shareStatus = document.querySelector<HTMLElement>("[data-share-status]");
+  const shareCloseControls = [...document.querySelectorAll<HTMLElement>("[data-share-close]")];
+
+  function setSharePanel(open: boolean) {
+    if (!sharePanel || !shareTrigger) return;
+
+    sharePanel.hidden = !open;
+    shareTrigger.setAttribute("aria-expanded", String(open));
+    document.body.classList.toggle("is-share-open", open);
+    if (!open && shareStatus) shareStatus.textContent = "";
+    if (open) {
+      sharePanel.querySelector<HTMLElement>(".share-close")?.focus();
+    }
+  }
+
+  shareTrigger?.addEventListener("click", () => {
+    setSharePanel(Boolean(sharePanel?.hidden));
+  });
+
+  async function copyShareLink(message: string) {
+    if (!shareInput || !shareStatus) return;
+
+    try {
+      await navigator.clipboard.writeText(shareInput.value);
+      shareStatus.textContent = message;
+    } catch {
+      shareInput.focus();
+      shareInput.select();
+      shareStatus.textContent = "Select and copy.";
+    }
+  }
+
+  shareCopyControls.forEach((control) => {
+    control.addEventListener("click", () => {
+      copyShareLink(control.closest(".share-links") ? "Copied for Discord." : "Copied.");
+    });
+  });
+
+  shareCloseControls.forEach((control) => {
+    control.addEventListener("click", () => setSharePanel(false));
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setSharePanel(false);
+  });
+
   document.querySelectorAll<HTMLElement>("[data-build-gallery]").forEach((gallery) => {
     const mainImage = gallery.querySelector<HTMLImageElement>("[data-gallery-main]");
     const buttons = [...gallery.querySelectorAll<HTMLButtonElement>("[data-gallery-src]")];
