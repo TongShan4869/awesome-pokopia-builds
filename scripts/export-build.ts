@@ -27,6 +27,20 @@ const heroDir = path.join(root, "public", "images", "builds", draft.slug);
 const heroPath = path.join(heroDir, "hero.png");
 await ensureDir(heroDir);
 await copyFile(path.join(root, draft.selectedFrame), heroPath);
+const publicGalleryImages: Array<{ src: string; alt?: string; caption?: string }> = [];
+for (const [index, image] of (draft.galleryFrames ?? []).entries()) {
+  if (image.frame === draft.selectedFrame) continue;
+
+  const extension = path.extname(image.frame) || ".png";
+  const filename = `gallery-${index + 1}${extension}`;
+  const publicPath = path.join(heroDir, filename);
+  await copyFile(path.join(root, image.frame), publicPath);
+  publicGalleryImages.push({
+    src: `/images/builds/${draft.slug}/${filename}`,
+    alt: image.alt,
+    caption: image.caption,
+  });
+}
 
 const publicItems = draft.inferredItems.map((item) => item.name);
 const publicInferredItems = draft.inferredItems.map((item) => ({
@@ -43,6 +57,8 @@ const sourceMetadataLines = [
   .filter((entry): entry is [string, string] => typeof entry[1] === "string" && entry[1].length > 0)
   .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
   .join("\n");
+const galleryImagesLine =
+  publicGalleryImages.length > 0 ? `galleryImages: ${JSON.stringify(publicGalleryImages)}\n` : "";
 const mdx = `---
 title: ${JSON.stringify(draft.title)}
 sourceUrl: ${JSON.stringify(draft.sourceUrl)}
@@ -50,7 +66,7 @@ ${sourceMetadataLines}
 platform: ${JSON.stringify(draft.platform)}
 creator: ${JSON.stringify(draft.creator)}
 heroImage: ${JSON.stringify(`/images/builds/${draft.slug}/hero.png`)}
-tags: ${JSON.stringify(draft.tags)}
+${galleryImagesLine}tags: ${JSON.stringify(draft.tags)}
 items: ${JSON.stringify(publicItems)}
 inferredItems: ${JSON.stringify(publicInferredItems)}
 summary: ${JSON.stringify(draft.summary)}
@@ -66,3 +82,6 @@ await writeFile(buildPath, `${mdx}\n`);
 
 console.log(`Exported public build: ${buildPath}`);
 console.log(`Copied hero image: ${heroPath}`);
+if (publicGalleryImages.length > 0) {
+  console.log(`Copied gallery images: ${publicGalleryImages.length}`);
+}
