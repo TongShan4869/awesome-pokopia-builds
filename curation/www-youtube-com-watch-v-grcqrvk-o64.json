@@ -1,0 +1,151 @@
+{
+  "slug": "www-youtube-com-watch-v-grcqrvk-o64",
+  "title": "Monet's Pond Water Garden",
+  "sourceUrl": "https://www.youtube.com/watch?v=gRCQRvK-O64",
+  "sourceTitle": "【Pokémon Pokopia】I Built a Monet-Inspired Pond for Water-Type Pokémon｜Withered Wasteland Town",
+  "sourceAuthor": "めいチャンネル",
+  "sourceAuthorUrl": "https://www.youtube.com/@May_orangeto",
+  "platform": "youtube",
+  "creator": "めいチャンネル",
+  "capturedAt": "2026-06-12T23:06:35.014Z",
+  "selectedFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png",
+  "frames": [
+    "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png",
+    "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/gallery-character-view.png",
+    "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/source-image-1.jpg"
+  ],
+  "galleryFrames": [
+    {
+      "frame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png",
+      "alt": "Monet-inspired Pokopia pond with lily pads, a green bridge, hanging vines, and a red canoe.",
+      "caption": "Primary pond view"
+    },
+    {
+      "frame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/gallery-character-view.png",
+      "alt": "Pokopia character waving in front of the Monet-inspired pond garden.",
+      "caption": "Garden entrance view"
+    }
+  ],
+  "tags": [
+    "pond",
+    "water",
+    "garden",
+    "bridge",
+    "floral",
+    "cozy"
+  ],
+  "summary": "A Monet-inspired Pokopia pond for Water-type Pokémon, with lily pads, white flowers, blue hedges, hanging vines, a green bridge, and a red canoe tucked along the water.",
+  "publicNotes": "## Build Notes\n\nThis build turns a bright water garden into a Monet-style pond, layering duckweed, white and pink flowers, blue hedges, and a soft green bridge over a clear pool. A red canoe anchors the right side while hanging vines and tall garden flowers make the cottage edge feel lush and overgrown.\n\nThe source frames focus on the finished scene rather than a material list, so the item list below is visually inferred from the screenshots and video thumbnail.",
+  "automationNotes": [
+    "Manual screenshots imported from the user-provided YouTube captures.",
+    "Item guesses are visually inferred; no creator material-list frame was captured."
+  ],
+  "frameAnalyses": [],
+  "reviewChecklist": {
+    "selectedFrameAutoPicked": false,
+    "selectedFrameNeedsHumanCheck": false,
+    "sourceMetadataNeedsHumanCheck": false,
+    "itemsNeedVisualReview": false,
+    "notesNeedRewrite": false
+  },
+  "inferredItems": [
+    {
+      "name": "Fresh Water",
+      "confidence": 0.9,
+      "evidence": "Large clear pond surface visible across the selected screenshot.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Duckweed",
+      "confidence": 0.85,
+      "evidence": "Round lily-pad clusters cover the pond surface.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Flowering Duckweed",
+      "confidence": 0.85,
+      "evidence": "White and pink flowering pads are layered through the water.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Canoe",
+      "confidence": 0.9,
+      "evidence": "Red canoe appears along the right edge of the pond.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Damp hedge (blue)",
+      "confidence": 0.8,
+      "evidence": "Blue hydrangea-like hedge clusters frame the pond and bridge.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/gallery-character-view.png"
+    },
+    {
+      "name": "Vine wall decoration",
+      "confidence": 0.8,
+      "evidence": "Leafy vines hang down the bridge and house walls.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Dense vines",
+      "confidence": 0.75,
+      "evidence": "Thick trailing greenery covers the bridge canopy and cottage edge.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Stylish hedge",
+      "confidence": 0.75,
+      "evidence": "Trimmed green hedges and planted borders surround the bridge and waterline.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Wooden handrail",
+      "confidence": 0.75,
+      "evidence": "The green bridge uses rail-like wooden segments across the pond.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Wooden fencing",
+      "confidence": 0.7,
+      "evidence": "Fence segments are visible on and around the bridge approach.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Wooden posts",
+      "confidence": 0.7,
+      "evidence": "Vertical supports hold the bridge/canopy structure over the pond.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Bridge planks",
+      "confidence": 0.7,
+      "evidence": "The pond crossing reads as a planted bridge structure.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Beautiful flower (white)",
+      "confidence": 0.75,
+      "evidence": "Tall white flowers stand in the foreground and water garden edges.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/gallery-character-view.png"
+    },
+    {
+      "name": "Beautiful flower (pink)",
+      "confidence": 0.7,
+      "evidence": "Soft pink blossoms appear among the water plants.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/selected-manual.png"
+    },
+    {
+      "name": "Skyland flowers (blue)",
+      "confidence": 0.65,
+      "evidence": "Blue flowers cluster near the character and pond border.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/gallery-character-view.png"
+    },
+    {
+      "name": "Tall grass",
+      "confidence": 0.7,
+      "evidence": "Tall soft grass fills the foreground and planted pond edge.",
+      "evidenceFrame": "curation/www-youtube-com-watch-v-grcqrvk-o64/frames/gallery-character-view.png"
+    }
+  ],
+  "rejectedItems": [],
+  "reviewState": "reviewed"
+}
